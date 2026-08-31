@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>BotFit — jouw botschema</title>
+<meta name="theme-color" content="#2f7d5b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BotFit">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#f4f6f4; --card:#fff; --ink:#1c231e; --muted:#67716a;
+    --accent:#2f7d5b; --accent-d:#245c44; --soft:#e5f0ea; --line:#e4e8e4;
+    --warn:#8a5a00; --warn-soft:#fbf2df; --danger:#b23b3b;
+    --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+  body{padding-bottom:calc(72px + var(--safe-bot))}
+  .top{background:linear-gradient(135deg,var(--accent),var(--accent-d));color:#fff;
+    padding:calc(14px + var(--safe-top)) 18px 16px;position:sticky;top:0;z-index:20}
+  .top h1{margin:0;font-size:19px;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+  .top .sub{margin:3px 0 0;font-size:12.5px;opacity:.9}
+  .wrap{padding:14px 14px 24px;max-width:640px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0;
+    box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  h2{font-size:16px;margin:4px 0 10px}
+  .muted{color:var(--muted);font-size:13px}
+  .periodpill{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--accent-d);
+    border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+  .daytabs{display:flex;gap:8px;margin:6px 0 4px}
+  .dtab{flex:1;padding:12px 4px;border-radius:12px;border:1px solid var(--line);background:#fff;
+    font-size:14px;font-weight:600;color:var(--muted);text-align:center;cursor:pointer}
+  .dtab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .dtab small{display:block;font-weight:400;font-size:10.5px;opacity:.85;margin-top:2px}
+  .ex{border:1px solid var(--line);border-radius:14px;padding:12px 12px 10px;margin:10px 0}
+  .ex .exhead{display:flex;justify-content:flex-start;align-items:center;gap:11px}
+  .ex .exthumb{width:56px;height:56px;flex:0 0 auto;border-radius:12px;overflow:hidden;position:relative;cursor:pointer}
+  .ex .exthumb svg{display:block;width:100%;height:100%}
+  .ex .exthumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .ex .exthumb .cambadge{position:absolute;right:2px;bottom:2px;width:17px;height:17px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:12px;line-height:17px;text-align:center;font-weight:700}
+  .ex .exname{font-weight:600;font-size:15px}
+  .ex .mwrap{width:46px;height:46px;flex:0 0 auto;margin-left:4px}
+  .ex .mwrap svg{width:100%;height:100%;display:block}
+  .tipbtn{margin-top:5px;background:none;border:none;color:var(--accent);font-size:12.5px;font-weight:600;
+    padding:2px 0;cursor:pointer}
+  .tipbox{background:var(--soft);border-radius:10px;padding:9px 11px;margin-top:9px;font-size:12.5px;color:#26483a;line-height:1.5}
+  .ex .extarget{font-size:12px;color:var(--muted);margin-top:2px}
+  .wrow{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .wbox{display:flex;align-items:center;gap:6px;background:#f4f7f5;border:1px solid var(--line);
+    border-radius:10px;padding:4px 4px 4px 10px}
+  .wbox label{font-size:12px;color:var(--muted)}
+  .wbox input{width:64px;border:none;background:transparent;font-size:17px;font-weight:700;
+    text-align:right;color:var(--ink);font-variant-numeric:tabular-nums;padding:4px 2px}
+  .wbox input:focus{outline:none}
+  .stepbtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;
+    font-size:19px;font-weight:700;color:var(--accent);cursor:pointer;line-height:1}
+  .sets{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;align-items:center}
+  .setdot{width:38px;height:38px;border-radius:11px;border:2px solid var(--line);background:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+  .setdot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+  .setchip{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 10px;font-size:13.5px;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums}
+  .setchip .sd{background:rgba(255,255,255,.28);border-radius:5px;padding:0 4px;margin-left:4px;font-size:11px}
+  .sidebtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:700;color:var(--accent-d);cursor:pointer;text-align:center;white-space:nowrap}
+  .sidebtn.act{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .logset{background:var(--accent);color:#fff;border:none;border-radius:11px;padding:11px 14px;font-size:14.5px;font-weight:700;cursor:pointer;flex:1}
+  .blockbtn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px}
+  .resttiny{font-size:12.5px;color:var(--accent);font-weight:600;background:var(--soft);
+    border:none;border-radius:9px;padding:9px 12px;cursor:pointer}
+  .hint{font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:9px;padding:6px 9px;margin-top:9px}
+  .btn{display:block;width:100%;padding:15px;border:none;border-radius:14px;background:var(--accent);color:#fff;
+    font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
+  .btn.sec{background:#eef2ef;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost{background:transparent;color:var(--danger);font-weight:600}
+  /* rest timer overlay */
+  #restOverlay{position:fixed;inset:0;background:rgba(20,30,24,.72);z-index:50;display:none;
+    align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(3px)}
+  #restOverlay .rt{font-size:74px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+  #restOverlay .rl{color:#cfe5d8;font-size:15px;margin-bottom:8px}
+  #restOverlay .rbtns{display:flex;gap:10px;margin-top:22px}
+  #restOverlay .rbtns button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+    color:#fff;border-radius:12px;padding:12px 18px;font-size:15px;font-weight:600;cursor:pointer}
+  #restOverlay .rbtns button.stop{background:#fff;color:var(--accent-d)}
+  /* nav */
+  .nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    display:flex;padding-bottom:var(--safe-bot);z-index:30}
+  .nav button{flex:1;border:none;background:none;padding:9px 0 8px;font-size:10.5px;color:var(--muted);
+    cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .nav button .ic{font-size:19px;line-height:1}
+  .nav button.active{color:var(--accent);font-weight:700}
+  .view{display:none}.view.active{display:block}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .chk{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid var(--line)}
+  .chk:last-child{border-bottom:none}
+  .chk .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--line);flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;cursor:pointer}
+  .chk .box.on{background:var(--accent);border-color:var(--accent)}
+  .chk .txt{font-size:14px}.chk .txt small{display:block;color:var(--muted);font-size:11.5px}
+  .field{margin:10px 0}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+  .field input,.field select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;font-size:15px;background:#fff}
+  .exedit{display:flex;gap:8px;align-items:center;margin:7px 0;flex-wrap:wrap}
+  .exedit select.stp{width:78px;padding:9px 4px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:#fff;flex:0 0 auto}
+  .exedit input.nm{min-width:120px}
+  .exedit .drag{cursor:grab;font-size:20px;line-height:1;color:#9aa69d;padding:4px 4px;touch-action:none;user-select:none;-webkit-user-select:none;flex:0 0 auto}
+  .exedit.dragging{opacity:.75;background:var(--soft);border-radius:10px}
+  .exedit .rowicon{width:34px;height:34px;flex:0 0 auto;border-radius:8px;overflow:hidden}
+  .exedit .rowicon svg{width:100%;height:100%;display:block}
+  .lib{margin-top:10px}
+  .lib summary{color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;padding:6px 0;list-style:none}
+  .lib summary::-webkit-details-marker{display:none}
+  .lib > summary::before{content:'▸';display:inline-block;width:15px;color:var(--accent);transition:transform .15s}
+  details.lib[open] > summary::before{transform:rotate(90deg)}
+  .lib.wk{border:1px solid var(--line);border-radius:12px;margin:8px 0;overflow:hidden}
+  .lib.wk > summary{background:var(--soft);padding:11px 12px}
+  .lib.fit{border:1px solid var(--line);border-radius:10px;padding:0 8px;background:#fff}
+  .libgrp{font-size:12px;font-weight:700;color:var(--accent-d);margin:12px 0 4px}
+  .libitem{display:flex;align-items:center;gap:10px;padding:7px 9px;border:1px solid var(--line);border-radius:11px;margin:6px 0;cursor:pointer;background:#fff}
+  .libitem:active{background:var(--soft)}
+  .libitem .li{width:40px;height:40px;flex:0 0 auto;border-radius:9px;overflow:hidden}
+  .libitem .li svg{width:100%;height:100%;display:block}
+  .libitem .ln{font-size:14px;font-weight:600;flex:1;min-width:0}
+  .libitem .ln .lm{font-size:11px;color:var(--muted);font-weight:400}
+  .libitem .libplus{margin-left:auto;color:#fff;background:var(--accent);width:26px;height:26px;border-radius:50%;text-align:center;line-height:26px;font-weight:700;flex:0 0 auto}
+  .lnk{background:none;border:none;color:var(--accent);font-weight:600;font-size:13px;cursor:pointer;padding:3px 0}
+  .lnk.danger{color:var(--danger)}
+  .exedit input.nm{flex:1;padding:9px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+  .exedit input.st{width:74px;padding:9px;border:1px solid var(--line);border-radius:10px;font-size:14px;text-align:right}
+  .exedit .del{background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer;padding:4px}
+  .addex{background:var(--soft);color:var(--accent-d);border:none;border-radius:10px;padding:10px;
+    font-size:13.5px;font-weight:600;width:100%;margin-top:6px;cursor:pointer}
+  .toast{position:fixed;left:50%;bottom:calc(84px + var(--safe-bot));transform:translateX(-50%);
+    background:#1c231e;color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;z-index:60;
+    opacity:0;transition:opacity .25s;pointer-events:none}
+  .toast.show{opacity:1}
+  .sesh{border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin:9px 0}
+  .sesh .sh{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600}
+  .sesh .sd{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5}
+  .big{font-size:26px;font-weight:800;color:var(--accent-d)}
+  /* verberg een eventueel geïnjecteerde host-badge (bv. Powered by Netlify) */
+  a[href*="netlify.com"],.netlify-badge,#netlify-badge,[class*="powered-by"]{display:none!important}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>🦴 BotFit <span style="font-weight:400;font-size:13px;opacity:.85">· jouw botschema</span></h1>
+  <p class="sub" id="topSub">Kracht + impact bij osteopenie</p>
+</div>
+
+<div class="wrap">
+  <!-- VANDAAG -->
+  <div class="view active" id="v-today">
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="periodpill" id="periodPill">Doel 3 × 8–12</span>
+        <button class="stepbtn" style="width:auto;padding:6px 10px;font-size:12px;font-weight:600" onclick="nav('set')">instellen</button>
+      </div>
+      <p class="muted" id="periodNote" style="margin:9px 0 0"></p>
+      <p class="muted" style="margin:8px 0 0;font-size:12px">Dubbele progressie: eerst reps opbouwen, dan gewicht erbij — een rustig stijgende lijn per oefening. 📈</p>
+    </div>
+
+    <div class="daytabs" id="dayTabs"></div>
+    <div class="card">
+      <h2 id="dayTitle">Dag A</h2>
+      <div id="exList"></div>
+      <div id="todayAdd" style="margin:4px 0 10px"></div>
+      <button class="btn" onclick="saveSession()">Training opslaan ✓</button>
+      <button class="btn sec" onclick="resetChecks()">Vinkjes wissen</button>
+    </div>
+  </div>
+
+  <!-- HISTORIE -->
+  <div class="view" id="v-hist">
+    <div id="progDetail" style="display:none"></div>
+    <div id="progOverview">
+      <div class="card">
+        <h2>Voortgang per oefening</h2>
+        <p class="muted" style="margin-top:-4px">Je meest getrainde oefeningen bovenaan. Tik op een oefening voor je grafiek en je plan vooruit.</p>
+        <div id="progList"></div>
+      </div>
+      <div class="card">
+        <h2>Trainingslog</h2>
+        <div id="histList"><p class="muted">Nog geen trainingen opgeslagen.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOEDING -->
+  <div class="view" id="v-food">
+    <div class="card">
+      <h2>Lichaam &amp; taille</h2>
+      <p class="muted" style="margin-top:-4px">Je meest bekeken cijfers. Taille-tot-lengte is je beste maat: die volgt buikvet en laat spieropbouw ongemoeid.</p>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <div class="field" style="flex:1;margin:6px 0"><label>Gewicht (kg)</label><input type="number" step="0.1" inputmode="decimal" id="mWeight"></div>
+        <button class="btn" style="width:auto;margin:0 0 10px;padding:12px 15px" onclick="addMeasure()">Log</button>
+      </div>
+      <div id="bmiBox"></div>
+      <div id="wChart" style="margin-top:12px"></div>
+      <div class="field" style="margin:12px 0 0">
+        <label>Mijn doel</label>
+        <select id="nutriGoal" onchange="setGoal(this.value)">
+          <option value="behoud">Gewicht behouden</option>
+          <option value="aankomen">Aankomen (spier opbouwen)</option>
+          <option value="afvallen">Afvallen</option>
+        </select>
+      </div>
+      <div id="advice" class="good" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h2>Lichaamsmaten</h2>
+      <p class="muted" style="margin-top:-4px">Vul je omtrekken in (cm) om je vorm over tijd te volgen — handig bij een recomp, want spier groeit terwijl je taille slinkt. Je taille is kleurgecodeerd op je taille-tot-lengte.</p>
+      <div id="bodyBox"></div>
+    </div>
+    <div class="card">
+      <h2>Botdichtheid (DEXA)</h2>
+      <p class="muted" style="margin-top:-4px">Je T-scores per meetplek. Bot verandert traag — herhaal doorgaans elke 1–2 jaar. Rood = osteoporose, oranje = osteopenie, groen = normaal.</p>
+      <div id="dexaTable"></div>
+      <div id="dexaConclusion"></div>
+      <details style="margin-top:12px">
+        <summary style="color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;padding:4px 0">+ nieuwe DEXA-meting toevoegen</summary>
+        <div class="field" style="margin:10px 0 4px"><label>Datum</label><input type="date" id="dxDate"></div>
+        <div class="grid2">
+          <div class="field" style="margin:6px 0"><label>LWK gemiddeld</label><input type="number" step="0.1" inputmode="decimal" id="dxSpine"></div>
+          <div class="field" style="margin:6px 0"><label>Laagste (bv. L1)</label><input type="number" step="0.1" inputmode="decimal" id="dxSpineLow"></div>
+          <div class="field" style="margin:6px 0"><label>Heup links gem.</label><input type="number" step="0.1" inputmode="decimal" id="dxHipL"></div>
+          <div class="field" style="margin:6px 0"><label>Hals links</label><input type="number" step="0.1" inputmode="decimal" id="dxNeckL"></div>
+          <div class="field" style="margin:6px 0"><label>Heup rechts gem.</label><input type="number" step="0.1" inputmode="decimal" id="dxHipR"></div>
+          <div class="field" style="margin:6px 0"><label>Hals rechts</label><input type="number" step="0.1" inputmode="decimal" id="dxNeckR"></div>
+        </div>
+        <div class="field" style="margin:6px 0"><label>Opmerking (bv. VFA)</label><input type="text" id="dxNote"></div>
+        <button class="btn" onclick="addDexa()">DEXA-meting opslaan</button>
+      </details>
+    </div>
+    <div class="card" style="padding:12px 16px">
+      <details class="lib">
+        <summary style="font-size:16px;color:var(--ink);font-weight:700">Voeding-pijlers loggen (optioneel)</summary>
+        <p class="muted" style="margin:8px 0 0">Vink je vier pijlers af en vul optioneel je calorie-inname in. Alleen als je wilt — je gewicht en BMI hierboven zijn de kern.</p>
+        <div class="field" style="margin:6px 0"><label>Datum</label><input type="date" id="foodDateInput" onchange="setFoodDate(this.value)"></div>
+        <div id="foodChecks"></div>
+        <div class="field" style="margin:12px 0 0"><label>Calorie-inname deze dag (kcal)</label><input type="number" inputmode="numeric" id="foodKcal" onchange="setFoodKcal(this.value)"></div>
+        <p class="muted" id="streak" style="margin-top:10px"></p>
+        <p class="muted" id="kcalAvg" style="margin-top:2px"></p>
+        <h2 style="margin-top:16px">Voeding-trend per week</h2>
+        <p class="muted" style="margin-top:-4px">Percentage van je 4 pijlers dat je haalde, per week (laatste 8 weken).</p>
+        <div id="adherChart"></div>
+      </details>
+    </div>
+    <div class="card">
+      <h2>Richtlijnen kort</h2>
+      <table>
+        <tr><th>Pijler</th><th>Doel/dag</th></tr>
+        <tr><td>Calcium</td><td class="num">1000–1200 mg</td></tr>
+        <tr><td>Vitamine D</td><td class="num">~20 µg (800 IE)</td></tr>
+        <tr><td>Eiwit</td><td class="num">1,0–1,2 g/kg</td></tr>
+        <tr><td>Groente/fruit</td><td class="num">ruim</td></tr>
+      </table>
+      <p class="muted" style="margin-top:10px">Calciumbronnen: melk (~240 mg/glas), yoghurt/kwark, kaas, amandelen, broccoli, sardientjes met graat. Vitamine D vooral via supplement + vette vis. Stem supplementen af met je huisarts.</p>
+    </div>
+  </div>
+
+  <!-- BEWEGING -->
+  <div class="view" id="v-move">
+    <div class="card">
+      <h2>Activiteit opslaan</h2>
+      <p class="muted" style="margin-top:-4px">Log een activiteit (ook op een eerdere datum). Je fitness-trainingen verschijnen automatisch in het weekoverzicht hieronder.</p>
+      <div class="field" style="margin:6px 0"><label>Datum</label><input type="date" id="ctDate"></div>
+      <div class="field" style="margin:6px 0"><label>Type</label><select id="ctType" onchange="ctToggle()">
+        <option value="Bokszak">Bokszaktraining</option>
+        <option value="Kracht & fit">Kracht &amp; fit</option>
+        <option value="Wielrennen">Wielrennen</option>
+        <option value="Hardlopen">Hardlopen</option>
+        <option value="Tennis">Tennis</option>
+        <option value="Anders">Anders…</option>
+      </select></div>
+      <div class="field" style="margin:6px 0;display:none" id="ctSportWrap"><label>Welke sport?</label><input type="text" id="ctSport" placeholder="bijv. zwemmen"></div>
+      <div style="display:flex;gap:8px">
+        <div class="field" style="flex:1;margin:6px 0"><label>Duur (min)</label><input type="number" inputmode="numeric" id="ctDuur"></div>
+        <div class="field" style="flex:1;margin:6px 0" id="ctKmWrap"><label>Afstand (km)</label><input type="number" inputmode="decimal" step="0.1" id="ctKm"></div>
+      </div>
+      <button class="btn" onclick="addCross()">Activiteit opslaan</button>
+    </div>
+    <div class="card">
+      <h2>Activiteiten per week</h2>
+      <p class="muted" style="margin-top:-4px">Fitness (automatisch) én je handmatige activiteiten, per week. Klap open voor de details; tik op een activiteit om aan te passen.</p>
+      <div id="actWeeks"></div>
+    </div>
+    <div class="card" style="padding:12px 16px">
+      <details class="lib">
+        <summary style="font-size:16px;color:var(--ink);font-weight:700">Stappen (optioneel)</summary>
+        <p class="muted" style="margin:8px 0 0">Beweging búiten je training. Handmatig of overgenomen uit Apple Health — hoeft niet, het is een extraatje.</p>
+        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:6px">
+          <div class="field" style="flex:1;min-width:120px;margin:6px 0"><label>Datum</label><input type="date" id="sDate"></div>
+          <div class="field" style="width:108px;margin:6px 0"><label>Stappen</label><input type="number" inputmode="numeric" id="sSteps"></div>
+          <button class="btn" style="width:auto;margin:0 0 10px;padding:12px 15px" onclick="addSteps()">Log</button>
+        </div>
+        <div id="stepToday"></div>
+        <div id="stepChart" style="margin-top:12px"></div>
+        <p class="muted" id="stepAvg" style="margin-top:6px"></p>
+        <div class="field" style="margin-top:10px"><label>Dagdoel stappen</label><input type="number" step="500" id="stepGoal" onchange="setStepGoal(this.value)"></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- INSTELLINGEN -->
+  <div class="view" id="v-set">
+    <div class="card">
+      <h2>☁️ Cloud-synchronisatie</h2>
+      <div id="cloudBox"></div>
+    </div>
+    <div class="card">
+      <h2>Programma</h2>
+      <div class="field">
+        <label>Startdatum programma (bepaalt je periode)</label>
+        <input type="date" id="startDate" onchange="setStartDate(this.value)">
+      </div>
+      <div class="field">
+        <label>Rusttijd tussen sets (seconden)</label>
+        <input type="number" id="restSec" step="15" min="30" onchange="setRest(this.value)">
+      </div>
+      <div class="field">
+        <label>Trainingsdoel — sets × reps (dubbele progressie)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="setsTarget" step="1" min="1" max="6" style="width:70px" onchange="setSets(this.value)">
+          <span class="muted">sets ×</span>
+          <input type="number" id="repLow" step="1" min="1" max="30" style="width:70px" onchange="setRepLow(this.value)">
+          <span class="muted">–</span>
+          <input type="number" id="repHigh" step="1" min="1" max="30" style="width:70px" onchange="setRepHigh(this.value)">
+          <span class="muted">reps</span>
+        </div>
+        <p class="muted" style="margin:4px 0 0;font-size:12px">Geen vaste periodes meer. Je doet elke keer dit aantal sets; je bouwt reps op van de onderkant naar de bovenkant en verhoogt pas dán het gewicht. Zo krijg je per oefening een rustig stijgende lijn.</p>
+      </div>
+      <div class="field">
+        <label>Gewichtsverhoging bij progressie (%)</label>
+        <input type="number" id="progPct" step="0.5" min="0" onchange="setProgPct(this.value)">
+        <p class="muted" style="margin:4px 0 0;font-size:12px">Kleine wekelijkse stap (2‑voor‑2). Percentage van je gewicht i.p.v. een vaste stap, zo is +bij 140 kg groter dan bij 10 kg (min. 0,5 kg).</p>
+      </div>
+      <div class="field">
+        <label>Bloksprong na ~4 weken (%)</label>
+        <input type="number" id="blockPct" step="0.5" min="0" onchange="setBlockPct(this.value)">
+        <p class="muted" style="margin:4px 0 0;font-size:12px">Grotere sprong die alleen verschijnt na 4 weken consistent trainen mét progressie (standaard 7%).</p>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Startgewichten per toestel</h2>
+      <p class="muted" style="margin-top:-4px">Vul in wat je nu tilt (onderkant van je rep-range, ~2 in de tank). Het keuzemenu ernaast (±) is de kleinste gewichtsstap van dát toestel: meestal 2,5 kg voor schijfmachines (paar van 1,25) en 5 kg voor kabelstacks. De app rondt alle voorstellen af op die stap.</p>
+      <div id="editA"></div>
+      <div id="editB"></div>
+      <div id="editC"></div>
+      <button class="btn sec" style="margin-top:12px" onclick="restoreDefaults()">Ontbrekende standaardoefeningen herstellen</button>
+      <p class="muted" style="margin-top:6px">Per ongeluk een oefening verwijderd (zoals Leg press)? Deze knop zet alle standaardoefeningen terug die nog ontbreken, zonder je bestaande oefeningen of gewichten te wijzigen.</p>
+    </div>
+    <div class="card">
+      <h2>Gegevens</h2>
+      <button class="btn sec" onclick="exportData()">Exporteer mijn data (JSON)</button>
+      <button class="btn ghost" onclick="resetAll()">Alles wissen &amp; opnieuw beginnen</button>
+      <p class="muted" style="margin-top:8px">Je gegevens staan alleen op deze telefoon (in de browser), niet op een server.</p>
+    </div>
+    <p class="muted" style="text-align:center">BotFit <b>v29</b> · algemene info, geen medisch advies. Overleg zwaar trainen met je arts.</p>
+  </div>
+</div>
+
+<!-- rest timer -->
+<div id="restOverlay">
+  <div class="rl" id="restLabel">Rust</div>
+  <div class="rt" id="restTime">1:30</div>
+  <div class="rbtns">
+    <button onclick="addRest(15)">+15s</button>
+    <button class="stop" onclick="stopRest()">Klaar</button>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="active" data-v="today" onclick="nav('today')"><span class="ic">🏋️</span>Vandaag</button>
+  <button data-v="hist" onclick="nav('hist')"><span class="ic">📈</span>Voortgang</button>
+  <button data-v="move" onclick="nav('move')"><span class="ic">🚶</span>Beweging</button>
+  <button data-v="food" onclick="nav('food')"><span class="ic">🥗</span>Gezondheid</button>
+  <button data-v="set" onclick="nav('set')"><span class="ic">⚙️</span>Instellingen</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="supabase.js"></script>
+<script>
+/* ---------- data ---------- */
+var KEY='botfit_v1';
+var PERIODS=[
+  {name:'Periode 1',sets:3,reps:12,mult:1.00,weeks:'wk 1–4'},
+  {name:'Periode 2',sets:3,reps:10,mult:1.07,weeks:'wk 5–8'},
+  {name:'Periode 3',sets:4,reps:8, mult:1.15,weeks:'wk 9–12'},
+  {name:'Periode 4',sets:4,reps:6, mult:1.22,weeks:'wk 13–16'}
+];
+var DEFAULTS={
+  A:[['Leg press',100],['Hack squat / Smith squat',60],['Leg extension',45],['Leg curl',40],
+     ['Hip-abductie',45],['Kuitmachine',60],['Rugextensie (+gewicht)',10],['Buikmachine',30]],
+  B:[['Chest press',40],['Shoulder press',30],['Lat pulldown',50],['Seated row',50],
+     ['Pec deck (fly)',35],['Reverse fly',30],['Triceps pushdown',25],['Biceps curl',20]],
+  C:[['Leg press (zwaar)',110],['Chest press',42.5],['Lat pulldown',52.5],['Seated row',52.5],
+     ['Shoulder press',32.5],['Leg curl',42.5],['Kuitmachine',65],["Farmer's carry (p/hand)",24]]
+};
+var DAYLABEL={A:'Onderlichaam & core',B:'Bovenlichaam',C:'Full body'};
+/* oefeningenbibliotheek — kies hieruit om toe te voegen aan een dag (c = spiergroep) */
+var CATALOG=[
+  {n:'Chest press',s:40,c:'Borst'},{n:'Chest press (plate-loaded)',s:30,c:'Borst'},{n:'Incline chest press',s:30,c:'Borst'},{n:'Bankdrukken (bench press)',s:40,c:'Borst'},{n:'Pec deck (fly)',s:35,c:'Borst'},{n:'Cable fly (crossover)',s:15,c:'Borst'},
+  {n:'Lat pulldown',s:50,c:'Rug'},{n:'Seated row',s:50,c:'Rug'},{n:'Row (plate-loaded / iso)',s:40,c:'Rug'},{n:'Optrekken (pull-up)',s:0,c:'Rug'},{n:'Reverse fly',s:30,c:'Rug'},{n:'Face pull',s:20,c:'Rug'},
+  {n:'Shoulder press',s:30,c:'Schouders'},{n:'Shoulder press (plate-loaded)',s:25,c:'Schouders'},{n:'Lateral raise',s:10,c:'Schouders'},
+  {n:'Biceps curl',s:20,c:'Armen'},{n:'Cable curl',s:20,c:'Armen'},{n:'Triceps pushdown',s:25,c:'Armen'},{n:'Triceps dip machine',s:35,c:'Armen'},
+  {n:'Leg press',s:100,c:'Benen'},{n:'Barbell squat',s:40,c:'Benen'},{n:'Hack squat / Smith squat',s:60,c:'Benen'},{n:'Leg extension',s:45,c:'Benen'},{n:'Leg curl',s:40,c:'Benen'},{n:'Hip-abductie (Inspire outer)',s:45,c:'Benen'},{n:'Hip-adductie (Inspire inner)',s:45,c:'Benen'},{n:'Kuitmachine',s:60,c:'Benen'},
+  {n:'AbCore (buik, met assist)',s:10,c:'Core & overig'},{n:'Rugextensie (+gewicht)',s:10,c:'Core & overig'},{n:'Buikmachine',s:30,c:'Core & overig'},{n:"Farmer's carry (p/hand)",s:24,c:'Core & overig'}
+];
+function catalogOptions(){
+  var cats={},order=[];
+  CATALOG.forEach(function(it){if(!cats[it.c]){cats[it.c]=[];order.push(it.c);}cats[it.c].push(it);});
+  var h='<option value="" disabled selected>Kies een oefening…</option>';
+  order.forEach(function(c){h+='<optgroup label="'+c+'">';cats[c].forEach(function(it){h+='<option value="'+it.n.replace(/"/g,'&quot;')+'">'+it.n+'</option>';});h+='</optgroup>';});
+  h+='<optgroup label="Overig"><option value="__custom">✏️ Eigen oefening…</option></optgroup>';
+  return h;
+}
+function addFromCatalog(d,val){
+  if(!val){toast('Kies eerst een oefening');return;}
+  var name,start;
+  if(val==='__custom'){name='Nieuwe oefening';start=20;}
+  else{var it=CATALOG.filter(function(x){return x.n===val;})[0];if(!it){toast('Onbekende oefening');return;}name=it.n;start=it.s;}
+  S.exercises[d].push({id:d+'x_'+Date.now(),name:name,start:start});
+  save();refreshActive();toast(name+' toegevoegd aan dag '+d);
+}
+function buildLibrary(day,openLabel){
+  var cats={},order=[];
+  CATALOG.forEach(function(it){if(!cats[it.c]){cats[it.c]=[];order.push(it.c);}cats[it.c].push(it);});
+  var h='<details class="lib"><summary>➕ '+(openLabel||'Oefening toevoegen uit bibliotheek')+'</summary>';
+  order.forEach(function(c){
+    h+='<div class="libgrp">'+c+'</div>';
+    cats[c].forEach(function(it){
+      var key=iconFor(it.n),mn=muscleNames(MUSC[key]||{})||'diverse spieren';
+      h+='<div class="libitem" data-day="'+day+'" data-name="'+it.n.replace(/"/g,'&quot;')+'"><div class="li">'+svgWrap(SVGS[key]||SVGS.default)+'</div><div class="ln">'+it.n+'<div class="lm">'+mn+'</div></div><span class="libplus">+</span></div>';
+    });
+  });
+  h+='<div class="libgrp">Overig</div><div class="libitem" data-day="'+day+'" data-name="__custom"><div class="li">'+svgWrap(SVGS.default)+'</div><div class="ln">✏️ Eigen oefening…<div class="lm">zelf een naam typen</div></div><span class="libplus">+</span></div>';
+  h+='</details>';
+  return h;
+}
+function wireLibrary(container){
+  container.querySelectorAll('.libitem').forEach(function(el){
+    el.onclick=function(){addFromCatalog(el.getAttribute('data-day'),el.getAttribute('data-name'));};
+  });
+}
+function weightHistory(exId){var h=[];for(var i=0;i<S.logs.length;i++){var L=S.logs[i];var en=L.entries.filter(function(x){return x.exId===exId&&x.weight!=null;})[0];if(en)h.push({date:L.date,w:en.weight});}h.sort(function(a,b){return a.date<b.date?-1:1;});return h;}
+function lastIncrease(exId){var h=weightHistory(exId),res=null;for(var i=1;i<h.length;i++){if(h[i].w>h[i-1].w)res={date:h[i].date,to:h[i].w};}return res;}
+var FOODITEMS=[
+  ['calcium','Calcium','3–4 porties zuivel of groente/noten'],
+  ['protein','Eiwit','bij elke maaltijd (kwark, ei, vis, vlees, peulvr.)'],
+  ['vitd','Vitamine D','supplement genomen (~20 µg)'],
+  ['veg','Groente & fruit','ruim gegeten']
+];
+
+/* ---------- machine icons + technique tips ---------- */
+function svgWrap(inner){return '<svg viewBox="0 0 64 64"><rect x="1" y="1" width="62" height="62" rx="13" fill="#eef3f0"/>'+inner+'</svg>';}
+/* gedetailleerde toesteltekeningen, Steelflex-stijl: stalen frame + zwarte kussens + gewichtskolom */
+var C={st:'#8b978d',dk:'#535d54',pd:'#2f3833',sk:'#aab4ab',pin:'#2f7d5b'};
+function fl(w){return '<rect x="6" y="50" width="'+(w||52)+'" height="4" rx="2" fill="'+C.dk+'"/>';}
+function stk(x){var s='<rect x="'+x+'" y="14" width="12" height="36" rx="2" fill="'+C.sk+'" stroke="'+C.dk+'" stroke-width="1.4"/>';for(var y=19;y<=47;y+=4){s+='<line x1="'+(x+1.5)+'" y1="'+y+'" x2="'+(x+10.5)+'" y2="'+y+'" stroke="'+C.dk+'" stroke-width="0.9"/>';}s+='<circle cx="'+(x+6)+'" cy="30" r="1.7" fill="'+C.pin+'"/><line x1="'+(x+3.5)+'" y1="9" x2="'+(x+3.5)+'" y2="14" stroke="'+C.dk+'" stroke-width="1.4"/><line x1="'+(x+8.5)+'" y1="9" x2="'+(x+8.5)+'" y2="14" stroke="'+C.dk+'" stroke-width="1.4"/>';return s;}
+function tb(a,b,c,d){return '<line x1="'+a+'" y1="'+b+'" x2="'+c+'" y2="'+d+'" stroke="'+C.st+'" stroke-width="3.2" stroke-linecap="round"/>';}
+function td(a,b,c,d){return '<line x1="'+a+'" y1="'+b+'" x2="'+c+'" y2="'+d+'" stroke="'+C.dk+'" stroke-width="3" stroke-linecap="round"/>';}
+function pr(x,y,w,h,r){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(r==null?3:r)+'" fill="'+C.pd+'"/>';}
+function rl(x,y){return '<circle cx="'+x+'" cy="'+y+'" r="3.3" fill="'+C.pd+'"/>';}
+function pl(x,y,r){return '<circle cx="'+x+'" cy="'+y+'" r="'+(r||5)+'" fill="'+C.st+'" stroke="'+C.dk+'" stroke-width="1.4"/>';}
+var SVGS={
+  legpress:fl(42)+pr(9,35,6,14,3)+pr(12,45,13,4,2)+tb(20,46,46,24)+pl(33,35)+pl(28,39)+td(41,18,51,28)+td(44,16,54,26),
+  squat:fl()+tb(15,12,15,50)+tb(49,12,49,50)+tb(15,12,49,12)+pl(20,26,6)+pl(44,26,6)+td(18,26,46,26),
+  legext:fl()+stk(45)+tb(18,20,18,48)+pr(14,28,5,14,2)+pr(16,44,14,4,2)+'<circle cx="30" cy="40" r="1.8" fill="'+C.dk+'"/>'+tb(30,40,40,30)+rl(41,29),
+  legcurl:fl()+stk(45)+pr(14,28,5,14,2)+pr(16,44,14,4,2)+pr(24,30,13,3,2)+tb(36,32,40,44)+rl(40,45),
+  hipab:fl()+pr(27,26,10,17,3)+pr(24,44,16,4,2)+pr(18,33,4,11,2)+pr(42,33,4,11,2)+tb(29,35,21,38)+tb(35,35,43,38),
+  calf:fl()+stk(45)+tb(28,17,28,44)+pr(19,16,17,5,2)+'<rect x="20" y="44" width="15" height="4" rx="1" fill="'+C.dk+'"/>',
+  backext:fl(38)+tb(14,48,34,28)+'<circle cx="28" cy="34" r="5" fill="'+C.pd+'"/>'+tb(30,32,30,48)+rl(15,46)+rl(15,40),
+  abcrunch:fl()+stk(45)+pr(14,26,5,16,2)+pr(16,44,13,4,2)+tb(18,30,30,26)+pr(28,23,4,8,2)+'<circle cx="18" cy="40" r="1.8" fill="'+C.dk+'"/>',
+  chestpress:fl()+stk(45)+pr(13,24,5,20,2)+pr(15,44,13,4,2)+tb(18,30,33,30)+pr(33,24,3,12,1),
+  shoulderpress:fl()+stk(45)+pr(14,30,5,15,2)+pr(16,44,12,4,2)+tb(19,32,19,18)+pr(14,15,11,3,1),
+  latpulldown:tb(12,12,52,12)+pl(32,14,2.4)+'<line x1="32" y1="15" x2="32" y2="19" stroke="'+C.dk+'" stroke-width="1.2"/>'+td(22,19,42,19)+td(21,22,23,19)+td(41,19,43,22)+fl()+tb(24,20,24,48)+pr(18,46,14,4,2)+pr(20,38,16,3,2),
+  seatedrow:fl()+stk(45)+pr(13,32,5,14,2)+pr(15,45,12,4,2)+pr(20,34,3,10,1)+'<line x1="23" y1="40" x2="41" y2="40" stroke="'+C.dk+'" stroke-width="1.2"/>'+pr(41,36,3,8,1)+tb(44,34,44,48),
+  pecdeck:fl()+stk(45)+pr(13,26,5,20,2)+pr(15,46,12,4,2)+pr(23,22,3,16,1)+pr(35,22,3,16,1)+tb(18,31,24,31)+tb(18,31,36,31),
+  reversefly:fl()+stk(45)+pr(13,26,5,20,2)+pr(15,46,12,4,2)+pr(22,22,3,16,1)+pr(38,22,3,16,1)+tb(24,31,20,25)+tb(36,31,40,25),
+  triceps:'<rect x="8" y="50" width="22" height="4" rx="2" fill="'+C.dk+'"/>'+tb(14,12,14,52)+tb(14,14,24,14)+pl(24,14,2.3)+'<line x1="24" y1="15" x2="24" y2="27" stroke="'+C.dk+'" stroke-width="1.2"/>'+td(17,28,31,28),
+  biceps:fl()+stk(45)+pr(16,44,12,4,2)+tb(18,32,18,46)+'<path d="M20 41 L34 31 L37 34 L23 44 Z" fill="'+C.pd+'"/>'+tb(34,31,38,42)+rl(38,43),
+  farmer:fl()+'<rect x="12" y="24" width="11" height="16" rx="2" fill="'+C.st+'" stroke="'+C.dk+'" stroke-width="1.4"/><line x1="14" y1="29" x2="21" y2="29" stroke="'+C.dk+'" stroke-width="1"/><line x1="14" y1="35" x2="21" y2="35" stroke="'+C.dk+'" stroke-width="1"/>'+td(17,24,17,18)+'<rect x="41" y="24" width="11" height="16" rx="2" fill="'+C.st+'" stroke="'+C.dk+'" stroke-width="1.4"/><line x1="43" y1="29" x2="50" y2="29" stroke="'+C.dk+'" stroke-width="1"/><line x1="43" y1="35" x2="50" y2="35" stroke="'+C.dk+'" stroke-width="1"/>'+td(46,24,46,18),
+  default:stk(26)
+};
+var TIPS={
+  legpress:'Voeten heupbreed op het plateau, knieën volgen je tenen (niet naar binnen zakken). Duw via je hielen en zet je knieën boven niet volledig ‘op slot’. Onderrug tegen de steun houden.',
+  squat:'Rug neutraal (recht), borst omhoog, kern aangespannen. Zak tot je dijen ongeveer horizontaal, knieën in lijn met je tenen. Duw krachtig via je hielen omhoog.',
+  legext:'Strek rustig tot net niet volledig gestrekt, knijp je bovenbeen even aan, en laat gecontroleerd terug. Niet ‘wippen’ met momentum. Draaipunt op kniehoogte.',
+  legcurl:'Beweeg alleen vanuit je knie, heupen blijven op de bank. Knijp onderin even aan en laat langzaam terug — geen ruk.',
+  hipab:'Rechtop zitten, rustig naar buiten duwen tot lichte spanning, boven even vasthouden en langzaam terug. Laat je romp niet meebewegen.',
+  calf:'Volledige beweging: laat je hielen diep zakken (voel de rek) en kom hoog op je tenen. Boven 1 sec vasthouden, rustig tempo.',
+  backext:'Beweeg vanuit je heup met een neutrale rug. Kom tot je romp in lijn is met je benen — niet overstrekken. Rustig omhoog en omlaag.',
+  abcrunch:'Rol je romp gecontroleerd op vanuit je buikspieren (niet met je nek/armen trekken). Adem uit bovenin, laat langzaam terug.',
+  chestpress:'Schouderbladen naar achter en omlaag, handvatten op borsthoogte. Duw zonder je ellebogen volledig op slot te zetten; laat gecontroleerd terug tot lichte rek.',
+  shoulderpress:'Rug tegen de steun, kern aangespannen. Duw recht omhoog zonder door te buigen in je onderrug; boven niet volledig op slot.',
+  latpulldown:'Licht achterover, borst omhoog. Trek de stang naar je bovenborst door je ellebogen omlaag te sturen (niet met je handen ‘trekken’). Gecontroleerd omhoog.',
+  seatedrow:'Rug recht, borst omhoog. Trek de handvatten naar je buik en knijp je schouderbladen samen. Val niet voorover bij het terugkeren.',
+  pecdeck:'Ellebogen licht gebogen op pad-hoogte. Breng de pads rustig samen, knijp je borst even aan, en open gecontroleerd (voel de rek). Schouders laag.',
+  reversefly:'Lichte buiging in je ellebogen; beweeg vanuit je schouderbladen naar achter. Rustig, niet slingeren. Nek en schouders ontspannen.',
+  triceps:'Bovenarmen stil langs je lichaam — alleen je onderarm beweegt. Strek onderin volledig, laat gecontroleerd omhoog. Rechtop staan.',
+  biceps:'Ellebogen stil aan je zij, alleen je onderarm beweegt. Krul volledig en laat gecontroleerd zakken; niet slingeren met je rug.',
+  farmer:'Rechtop, schouders naar achter, kern aangespannen. Neem rustige, stabiele passen en leun niet voorover. Stevige greep.',
+  default:'Beweeg rustig en gecontroleerd met een volledige bewegingsuitslag. Rug neutraal, geen ruk of slinger — techniek gaat vóór gewicht.'
+};
+function iconFor(n){
+  n=(n||'').toLowerCase();
+  if(n.indexOf('leg press')>=0||n.indexOf('legpress')>=0)return 'legpress';
+  if(n.indexOf('hack')>=0||n.indexOf('smith')>=0||n.indexOf('squat')>=0)return 'squat';
+  if(n.indexOf('extension')>=0&&n.indexOf('leg')>=0)return 'legext';
+  if(n.indexOf('leg extension')>=0)return 'legext';
+  if(n.indexOf('leg curl')>=0)return 'legcurl';
+  if(n.indexOf('abduc')>=0)return 'hipab';
+  if(n.indexOf('kuit')>=0||n.indexOf('calf')>=0)return 'calf';
+  if(n.indexOf('rugext')>=0||n.indexOf('back ext')>=0||n.indexOf('hyperext')>=0)return 'backext';
+  if(n.indexOf('buik')>=0||n.indexOf('crunch')>=0||n.indexOf('abdominal')>=0)return 'abcrunch';
+  if(n.indexOf('chest')>=0||n.indexOf('bank')>=0)return 'chestpress';
+  if(n.indexOf('shoulder')>=0||n.indexOf('overhead')>=0)return 'shoulderpress';
+  if(n.indexOf('optrekken')>=0||n.indexOf('pull-up')>=0||n.indexOf('pullup')>=0||n.indexOf('chin')>=0)return 'latpulldown';
+  if(n.indexOf('lat')>=0||n.indexOf('pulldown')>=0)return 'latpulldown';
+  if(n.indexOf('row')>=0)return 'seatedrow';
+  if(n.indexOf('reverse')>=0||n.indexOf('rear')>=0)return 'reversefly';
+  if(n.indexOf('pec')>=0||n.indexOf('fly')>=0)return 'pecdeck';
+  if(n.indexOf('tricep')>=0)return 'triceps';
+  if(n.indexOf('bicep')>=0||n.indexOf('curl')>=0)return 'biceps';
+  if(n.indexOf('farmer')>=0||n.indexOf('carry')>=0)return 'farmer';
+  if(n.indexOf('lateral')>=0||n.indexOf('zijwaarts')>=0||n.indexOf('side raise')>=0)return 'shoulderpress';
+  if(n.indexOf('dip')>=0)return 'triceps';
+  if(n.indexOf('face pull')>=0)return 'reversefly';
+  if(n.indexOf('press')>=0)return 'shoulderpress';
+  return 'default';
+}
+/* ---------- spiergroep-poppetje (voor + achter) ---------- */
+var MUSC={
+  legpress:{quads:1,glutes:1,hams:1}, squat:{quads:1,glutes:1,hams:1,lowerback:1},
+  legext:{quads:1}, legcurl:{hams:1}, hipab:{glutes:1}, calf:{calves:1},
+  backext:{lowerback:1,glutes:1,hams:1}, abcrunch:{abs:1},
+  chestpress:{chest:1,delts:1,triceps:1}, shoulderpress:{delts:1,triceps:1},
+  latpulldown:{back:1,biceps:1}, seatedrow:{back:1,biceps:1}, pecdeck:{chest:1},
+  reversefly:{back:1,delts:1}, triceps:{triceps:1}, biceps:{biceps:1},
+  farmer:{forearms:1,traps:1,abs:1}, default:{}
+};
+var MUSCNAMES={quads:'quadriceps',hams:'hamstrings',glutes:'bilspieren',calves:'kuiten',chest:'borst',delts:'schouders',back:'rug (lats)',abs:'buikspieren',lowerback:'onderrug',biceps:'biceps',triceps:'triceps',forearms:'onderarmen',traps:'trapezius'};
+function muscleNames(act){var o=[];for(var k in act){if(act[k]&&MUSCNAMES[k])o.push(MUSCNAMES[k]);}return o.join(', ');}
+function muscleFigure(act){
+  var B='#c8d0ca',H='#2f7d5b';
+  function hl(cond,x,y,w,h,r){return cond?'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(r||1.4)+'" fill="'+H+'"/>':'';}
+  function fig(ox,back){
+    var s='<circle cx="'+(ox+10)+'" cy="5.5" r="3.2" fill="'+B+'"/>'+
+      '<rect x="'+(ox+6)+'" y="9" width="8" height="17" rx="2.5" fill="'+B+'"/>'+
+      '<rect x="'+(ox+2.5)+'" y="10" width="3.2" height="14" rx="1.6" fill="'+B+'"/>'+
+      '<rect x="'+(ox+14.3)+'" y="10" width="3.2" height="14" rx="1.6" fill="'+B+'"/>'+
+      '<rect x="'+(ox+6.4)+'" y="26" width="3.2" height="17" rx="1.4" fill="'+B+'"/>'+
+      '<rect x="'+(ox+10.4)+'" y="26" width="3.2" height="17" rx="1.4" fill="'+B+'"/>';
+    if(!back){
+      s+=hl(act.delts,ox+2.6,10,3.1,4)+hl(act.delts,ox+14.3,10,3.1,4);
+      s+=hl(act.chest,ox+6.4,11,7.2,5,2);
+      s+=hl(act.abs,ox+7.4,17,5.2,8,1.6);
+      s+=hl(act.biceps,ox+2.6,15,3.1,5)+hl(act.biceps,ox+14.3,15,3.1,5);
+      s+=hl(act.forearms,ox+2.6,20,3.1,4)+hl(act.forearms,ox+14.3,20,3.1,4);
+      s+=hl(act.quads,ox+6.4,27,3.2,10)+hl(act.quads,ox+10.4,27,3.2,10);
+    }else{
+      s+=hl(act.traps,ox+7,9.5,6,3,1.2);
+      s+=hl(act.back,ox+6.4,12,7.2,7,1.6);
+      s+=hl(act.lowerback,ox+7.4,19,5.2,5,1.4);
+      s+=hl(act.triceps,ox+2.6,14,3.1,6)+hl(act.triceps,ox+14.3,14,3.1,6);
+      s+=hl(act.glutes,ox+6.4,25,7.2,4,1.6);
+      s+=hl(act.hams,ox+6.4,29,3.2,8)+hl(act.hams,ox+10.4,29,3.2,8);
+      s+=hl(act.calves,ox+6.4,37,3.2,6)+hl(act.calves,ox+10.4,37,3.2,6);
+    }
+    return s;
+  }
+  return '<svg viewBox="0 0 48 48">'+fig(2,false)+fig(25,true)+'</svg>';
+}
+
+var S=load();
+function load(){
+  try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.exercises)return migrate(s);}catch(e){}
+  return fresh();
+}
+function fresh(){
+  var ex={};['A','B','C'].forEach(function(d){ex[d]=DEFAULTS[d].map(function(r,i){return {id:d+i+'_'+Math.floor(rnd()*1e5),name:r[0],start:r[1]};});});
+  return {startDate:todayISO(),restSec:90,exercises:ex,logs:[],food:{},periodOverride:null,photos:{},measure:[],nutriGoal:'behoud',steps:[],stepGoal:8000,dexa:[],dexaSeeded:true,cross:[],progPct:2.5,blockPct:7,blockJump:{},setsTarget:3,repLow:8,repHigh:12,heightCm:null,foodLogOn:false,waist:[],body:{},bodyHist:{}};
+}
+function migrate(s){ if(s.periodOverride===undefined)s.periodOverride=null; if(!s.food)s.food={}; if(!s.photos)s.photos={}; if(!s.measure)s.measure=[]; if(!s.nutriGoal)s.nutriGoal='behoud'; if(!s.steps)s.steps=[]; if(!s.stepGoal)s.stepGoal=8000; if(!s.dexa)s.dexa=[]; if(s.dexaSeeded===undefined)s.dexaSeeded=true; if(!s.cross)s.cross=[]; if(!s.progPct)s.progPct=2.5; if(!s.blockPct)s.blockPct=7; if(!s.blockJump)s.blockJump={}; if(!s.setsTarget)s.setsTarget=3; if(!s.repLow)s.repLow=8; if(!s.repHigh)s.repHigh=12; if(s.heightCm===undefined)s.heightCm=null; if(s.foodLogOn===undefined)s.foodLogOn=false; if(!s.waist)s.waist=[]; if(!s.body)s.body={}; if(!s.bodyHist)s.bodyHist={}; for(var bk in s.body){if(s.body[bk]&&s.body[bk].v!=null&&!(s.bodyHist[bk]&&s.bodyHist[bk].length)){s.bodyHist[bk]=[{date:s.body[bk].date||todayISO(),cm:s.body[bk].v}];}} return s; }
+function baselineDexa(){return {id:'DEXAbase',date:'2026-07-15',spine:-1.6,spineLow:-2.4,hipL:-1.6,neckL:-2.0,hipR:-1.5,neckR:-2.1,note:'Nulmeting — Ziekenhuis Rivierenland (VFA: geen inzakkingen)'};}
+function rawSave(){localStorage.setItem(KEY,JSON.stringify(S));}
+function save(skipPush){S.updatedAt=Date.now();rawSave();if(!skipPush)schedulePush();}
+/* ---------- cloud-sync (Supabase) ---------- */
+var SUPA_URL='https://dvspwrynwmnpbafoaljc.supabase.co';var SUPA_KEY='sb_publishable_eOgwNrZRn01RAporx647lQ_u_bmnp2C';
+var sb=null,pushTimer=null,lastSync=0,syncKey=null,syncId=null;
+var PASSKEY='botfit_pass';
+function initCloud(){
+  if(!(window.supabase&&SUPA_URL&&SUPA_KEY))return;
+  try{sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);}catch(e){sb=null;}
+  var saved=localStorage.getItem(PASSKEY);
+  if(saved){connectKey(saved,true);}else{renderCloud();}
+}
+function u8ToB64(u8){var s='',CH=0x8000;for(var i=0;i<u8.length;i+=CH){s+=String.fromCharCode.apply(null,u8.subarray(i,i+CH));}return btoa(s);}
+function b64ToU8(b64){var bin=atob(b64),u8=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return u8;}
+function deriveKeys(pass){
+  var enc=new TextEncoder();
+  return crypto.subtle.digest('SHA-256',enc.encode('botfit-sync-id:'+pass)).then(function(idBuf){
+    var a=new Uint8Array(idBuf),idHex='';for(var i=0;i<a.length;i++){idHex+=('0'+a[i].toString(16)).slice(-2);}
+    return crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveKey']).then(function(mat){
+      return crypto.subtle.deriveKey({name:'PBKDF2',salt:enc.encode('botfit-salt-v1'),iterations:100000,hash:'SHA-256'},mat,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+    }).then(function(key){return {id:idHex,key:key};});
+  });
+}
+function encJSON(key,obj){
+  var enc=new TextEncoder(),iv=crypto.getRandomValues(new Uint8Array(12));
+  return crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,enc.encode(JSON.stringify(obj))).then(function(ct){
+    var c=new Uint8Array(ct),out=new Uint8Array(iv.length+c.length);out.set(iv,0);out.set(c,iv.length);return u8ToB64(out);
+  });
+}
+function decJSON(key,b64){
+  var raw=b64ToU8(b64),iv=raw.subarray(0,12),ct=raw.subarray(12);
+  return crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,ct).then(function(pt){return JSON.parse(new TextDecoder().decode(pt));});
+}
+function connectKey(pass,silent){
+  if(!sb){toast('Cloud niet beschikbaar');return;}
+  if(!(window.crypto&&crypto.subtle)){toast('Versleuteling vereist https');return;}
+  deriveKeys(pass).then(function(k){
+    syncKey=k.key;syncId=k.id;localStorage.setItem(PASSKEY,pass);
+    renderCloud();pullCloud(function(){if(!silent)toast('Gekoppeld ✓');},true);
+  }).catch(function(){toast('Kon sleutel niet verwerken');});
+}
+function disconnectKey(){localStorage.removeItem(PASSKEY);syncKey=null;syncId=null;lastSync=0;renderCloud();toast('Ontkoppeld (data blijft op dit toestel)');}
+function schedulePush(){if(!sb||!syncKey)return;if(pushTimer)clearTimeout(pushTimer);pushTimer=setTimeout(pushCloud,1500);}
+function pushCloud(){
+  if(!sb||!syncKey)return;
+  encJSON(syncKey,S).then(function(blob){return sb.rpc('sync_set',{p_id:syncId,p_blob:blob});})
+    .then(function(res){if(!res||!res.error){lastSync=Date.now();renderCloud();}}).catch(function(){});
+}
+function pullCloud(done,preferCloud){
+  if(!sb||!syncKey){if(done)done();return;}
+  sb.rpc('sync_get',{p_id:syncId}).then(function(res){
+    var rows=res.data,blob=(rows&&rows.length)?rows[0].blob:null;
+    if(blob){
+      decJSON(syncKey,blob).then(function(data){
+        var cU=(data&&data.updatedAt)||0,lU=S.updatedAt||0;
+        if(preferCloud||cU>lU){S=migrate(data);rawSave();refreshActive();toast('Gegevens uit de cloud geladen');}
+        else if(lU>cU){pushCloud();}
+        lastSync=Date.now();renderCloud();if(done)done();
+      }).catch(function(){toast('Ontsleutelen mislukt — klopt je sleutel?');if(done)done();});
+    }else{pushCloud();lastSync=Date.now();renderCloud();if(done)done();}
+  }).catch(function(){if(done)done();});
+}
+function syncNow(){if(!syncKey){toast('Koppel eerst je sleutel');return;}toast('Synchroniseren…');pullCloud();}
+function cloudConnect(){var p=(document.getElementById('cloudPass').value||'').trim();if(p.length<6){toast('Kies een sleutel van minstens 6 tekens');return;}connectKey(p,false);}
+function renderCloud(){
+  var el=document.getElementById('cloudBox');if(!el)return;
+  if(!sb){el.innerHTML='<p class="muted">Cloud-synchronisatie is nog niet geconfigureerd in deze versie.</p>';return;}
+  if(syncKey){
+    el.innerHTML='<p style="margin:0 0 8px;font-size:14px">🔒 Gekoppeld — je sleutel is actief op dit toestel.</p>'+
+      (lastSync?'<p class="muted" style="margin:0 0 10px">Gesynchroniseerd ✓</p>':'<p class="muted" style="margin:0 0 10px">Nog niet gesynchroniseerd.</p>')+
+      '<button class="btn" onclick="syncNow()">Synchroniseer nu</button>'+
+      '<button class="btn sec" onclick="disconnectKey()">Ontkoppelen op dit toestel</button>';
+  }else{
+    el.innerHTML='<p class="muted" style="margin:0 0 8px">Kies één geheime sleutel en gebruik dezelfde op je iPhone én Mac. Je data wordt met deze sleutel versleuteld voordat het de cloud in gaat.</p>'+
+      '<div class="field" style="margin:6px 0"><label>Geheime sleutel</label><input type="text" id="cloudPass" autocomplete="off" placeholder="sterke zin uit NordPass"></div>'+
+      '<button class="btn" onclick="cloudConnect()">Koppelen</button>'+
+      '<p class="muted" style="margin-top:8px">⚠️ Bewaar deze sleutel in NordPass. Kwijt = je cloud-data is niet meer te ontsleutelen.</p>';
+  }
+}
+function refreshActive(){var v=document.querySelector('.view.active');if(!v)return;var id=v.id.replace('v-','');if(id==='today')renderToday();else if(id==='hist')renderHist();else if(id==='move')renderMove();else if(id==='food')renderFood();else if(id==='set')renderSettings();}
+var _seed=12345; function rnd(){_seed=(_seed*1103515245+12345)&0x7fffffff;return _seed/0x7fffffff;}
+function todayISO(){var d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());}
+function p2(n){return (n<10?'0':'')+n;}
+function round2(v){return Math.round(v/2.5)*2.5;}
+function fmt(v){return (Math.round(v*10)/10).toString().replace('.',',');}
+
+/* ---------- period logic ---------- */
+function currentPeriodIndex(){
+  if(S.periodOverride!==null&&S.periodOverride!==undefined)return S.periodOverride;
+  var start=new Date(S.startDate+'T00:00:00');
+  var now=new Date();
+  var days=Math.floor((now-start)/86400000);
+  if(days<0)days=0;
+  var idx=Math.floor(days/28);
+  return Math.min(3,idx);
+}
+function weeksSince(){
+  var start=new Date(S.startDate+'T00:00:00');var now=new Date();
+  var d=Math.floor((now-start)/86400000);return Math.max(0,Math.floor(d/7));
+}
+
+/* ---------- state UI ---------- */
+var curDay='A';
+var session={}; // exId -> {weight, setsDone}
+
+/* ---------- dubbele progressie (constante sets × rep-range) ---------- */
+function target(){return {sets:(S.setsTarget||3),repLow:(S.repLow||8),repHigh:(S.repHigh||12)};}
+function repHighDone(en){var t=target();if(en&&en.sets&&en.sets.length)return en.sets.length>=t.sets&&en.sets.every(function(s){return (s.r||0)>=t.repHigh;});return false;}
+function nextReps(e){
+  var t=target(),last=lastWeightFor(e.id);
+  if(!last)return t.repLow;
+  if(repHighDone(last))return t.repLow; // gewicht gaat omhoog, reps resetten
+  if(last.sets&&last.sets.length){var minR=Math.min.apply(null,last.sets.map(function(s){return s.r||0;}));return Math.min(t.repHigh,Math.max(t.repLow,minR+1));}
+  return t.repLow;
+}
+function initSession(){
+  session={};
+  S.exercises[curDay].forEach(function(e){session[e.id]=newSess(e);});
+}
+function newSess(e){return {weight:suggestWeight(e),reps:nextReps(e),side:'',sets:[]};}
+function sideLabel(s){return s==='S'?'Straight (S)':s==='L'?'Left (L)':s==='R'?'Right (R)':'Kant —';}
+function roundHalf(x){return Math.round(x*2)/2;}
+/* ---------- realistische gewichtsstappen (schijven / kabelstacks) ---------- */
+function defaultStep(name){
+  var n=(name||'').toLowerCase();
+  // kabel-/stack-toestellen gaan meestal per 5 kg
+  if(n.indexOf('pulldown')>=0||n.indexOf('lat ')>=0||n.indexOf('row')>=0||n.indexOf('seated row')>=0||n.indexOf('pushdown')>=0||n.indexOf('cable')>=0||n.indexOf('crossover')>=0||n.indexOf('face pull')>=0||n.indexOf('pec deck')>=0||n.indexOf('reverse fly')>=0)return 5;
+  // schijfgeladen / vrije gewichten: per 2,5 kg (paar van 1,25) — fijner instelbaar in Instellingen
+  return 2.5;
+}
+function exStep(e){return (e&&e.step)?e.step:defaultStep(e&&e.name);}
+function snapStep(w,step){step=step||2.5;return Math.round(w/step)*step;}
+function progInc(w,step){step=step||2.5;var pct=(S.progPct||2.5)/100;var inc=Math.round((w*pct)/step)*step;return Math.max(step,inc);}
+function sidesOn(e){return e.sides===true||(e.sides===undefined&&iconFor(e.name)==='abcrunch');}
+function wtypeSide(e){return e.wtype==='side';}
+function findEx(id){var r=null;['A','B','C'].forEach(function(d){S.exercises[d].forEach(function(e){if(e.id===id)r=e;});});return r;}
+function toggleSides(id){var e=findEx(id);if(!e)return;e.sides=!sidesOn(e);save();renderToday();toast('Kant (S/L/R) '+(sidesOn(e)?'aan':'uit')+' voor '+e.name);}
+function toggleWtype(id){var e=findEx(id);if(!e)return;e.wtype=(e.wtype==='side')?'total':'side';save();renderToday();toast('Gewicht: '+(e.wtype==='side'?'per kant':'totaal'));}
+function isoWeekMon(iso){var d=new Date(iso+'T00:00:00'),day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return isoOf(d);}
+/* bloksprong (+blockPct%) — prestatie-gestuurd: 4 opeenvolgende weken (of >=8 sessies) met progressie */
+function blockReady(exId){
+  var t=target();
+  var today=new Date(),start=new Date(today);start.setDate(today.getDate()-27);var startIso=isoOf(start);
+  var sess=[];for(var i=0;i<S.logs.length;i++){var L=S.logs[i];if(L.date<startIso)continue;var en=(L.entries||[]).filter(function(x){return x.exId===exId;})[0];if(en)sess.push({date:L.date,en:en});}
+  if(sess.length<2)return null;
+  sess.sort(function(a,b){return a.date<b.date?-1:1;});
+  var weeks={};sess.forEach(function(s){weeks[isoWeekMon(s.date)]=1;});
+  var enough=(Object.keys(weeks).length>=4)||(sess.length>=8);
+  if(!enough)return null;
+  var lastEn=sess[sess.length-1].en,setsArr=lastEn.sets||[];
+  var full=setsArr.length>=t.sets, twoHeavyReps=setsArr.filter(function(s){return (s.r||0)>=(t.repHigh-2);}).length>=2;
+  if(!(full&&twoHeavyReps))return null;
+  var firstTop=sess[0].en.weight||0, topNow=lastEn.weight||setsArr.reduce(function(m,s){return Math.max(m,s.w||0);},0);
+  if(topNow<firstTop)return null; // geen regressie
+  var lj=(S.blockJump||{})[exId];if(lj){if((today-new Date(lj+'T00:00:00'))/86400000<21)return null;}
+  var _e=findEx(exId),_st=exStep(_e);
+  return {target:snapStep(topNow*(1+(S.blockPct||7)/100),_st),weeks:Object.keys(weeks).length,sessions:sess.length,pct:(S.blockPct||7)};
+}
+function applyBlock(id){var br=blockReady(id);if(!br)return;session[id].weight=br.target;S.blockJump=S.blockJump||{};S.blockJump[id]=todayISO();save();renderToday();toast('Bloksprong +'+fmt(br.pct)+'% toegepast → '+fmt(br.target)+' kg 💪');}
+function lastWeightFor(exId){
+  for(var i=S.logs.length-1;i>=0;i--){
+    var en=S.logs[i].entries.find(function(x){return x.exId===exId;});
+    if(en&&en.weight)return en;
+  }
+  return null;
+}
+function suggestWeight(e){
+  var step=exStep(e),last=lastWeightFor(e.id);
+  if(last&&last.weight){
+    // dubbele progressie: gewicht pas omhoog als álle sets de bovenkant van de rep-range haalden
+    if(repHighDone(last))return snapStep(last.weight+progInc(last.weight,step),step);
+    return last.weight;
+  }
+  return snapStep(e.start||0,step);
+}
+/* forward-looking double-progression ladder: build reps up to repHigh, then step the weight */
+function progressionPlan(startW,startReps,n,step){
+  step=step||2.5;var t=target(),steps=[],w=startW||0,r=Math.max(t.repLow,Math.min(t.repHigh,startReps||t.repLow));
+  for(var i=0;i<n;i++){
+    steps.push({w:w,reps:r});
+    if(r>=t.repHigh){r=t.repLow;w=snapStep(w+progInc(w,step),step);}
+    else{r++;}
+  }
+  return steps;
+}
+function planLine(exId,startW,startReps){
+  var step=exStep(findEx(exId));
+  return progressionPlan(startW,startReps,5,step).map(function(s,i){return (i===0?'<b style="color:#245c44">':'')+fmt(s.w)+'×'+s.reps+(i===0?'</b>':'');}).join(' → ');
+}
+
+/* ---------- render: today ---------- */
+function renderToday(){
+  var t=target();
+  document.getElementById('periodPill').textContent='Doel '+t.sets+' × '+t.repLow+'–'+t.repHigh;
+  var w=weeksSince();
+  document.getElementById('periodNote').textContent='Rusttijd '+S.restSec+'s · week '+(w+1)+'. Haal je alle sets op '+t.repHigh+' reps? Dan gaat het gewicht omhoog — anders bouw je eerst je reps op. 📈';
+  document.getElementById('topSub').textContent=DAYLABEL[curDay];
+
+  var tabs=document.getElementById('dayTabs');tabs.innerHTML='';
+  ['A','B','C'].forEach(function(d){
+    var b=document.createElement('div');b.className='dtab'+(d===curDay?' active':'');
+    b.innerHTML='Dag '+d+'<small>'+DAYLABEL[d]+'</small>';
+    b.onclick=function(){curDay=d;initSession();renderToday();};
+    tabs.appendChild(b);
+  });
+  document.getElementById('dayTitle').textContent='Dag '+curDay+' — '+DAYLABEL[curDay];
+
+  var list=document.getElementById('exList');list.innerHTML='';
+  S.exercises[curDay].forEach(function(e){
+    var st=session[e.id]||newSess(e);session[e.id]=st;
+    if(!st.sets)st.sets=[];
+    var last=lastWeightFor(e.id);
+    var sOn=sidesOn(e),wSide=wtypeSide(e);
+    var div=document.createElement('div');div.className='ex';
+    var chips='';
+    st.sets.forEach(function(se,idx){chips+='<button class="setchip" data-ex="'+e.id+'" data-i="'+idx+'" title="tik om te verwijderen">'+fmt(se.w)+'×'+(se.r||0)+(se.s?'<span class="sd">'+se.s+'</span>':'')+'</button>';});
+    var estep=exStep(e);
+    var hint='';var br=blockReady(e.id);
+    if(br){hint='<div class="hint" style="background:var(--soft);color:#245c44;border:1px solid #cfe5d8">🏔️ Klaar voor <b>bloksprong +'+fmt(br.pct)+'%</b> ('+br.weeks+' wk consistent getraind) → <b>'+fmt(br.target)+' kg</b> <button class="blockbtn" data-block="'+e.id+'">Pas toe</button></div>';}
+    else if(last&&last.weight){if(repHighDone(last)){var inc=progInc(last.weight,estep);hint='<div class="hint">Vorige keer alle sets op '+t.repHigh+' reps — voorstel: +'+fmt(inc)+' kg (stap '+fmt(estep)+' kg) 💪</div>';}else{hint='<div class="hint" style="background:var(--soft);color:#245c44;border:1px solid #cfe5d8">Bouw je reps op richting '+t.repHigh+' op '+fmt(last.weight)+' kg — dán gaat het gewicht omhoog. 📈</div>';}}
+    var key=iconFor(e.name);
+    var act=MUSC[key]||MUSC.default;var mn=muscleNames(act)||'diverse spieren';
+    var streef=suggestWeight(e);
+    var proj=planLine(e.id,streef,st.reps);
+    var thumb=S.photos[e.id]?'<img src="'+S.photos[e.id]+'" alt="">':svgWrap(SVGS[key]||SVGS.default);
+    div.innerHTML=
+      '<div class="exhead">'+
+        '<div class="exthumb" data-photo="'+e.id+'">'+thumb+'<span class="cambadge">'+(S.photos[e.id]?'✎':'+')+'</span></div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div class="exname">'+e.name+'</div>'+
+          '<div class="extarget">Doel: '+t.sets+' × '+t.repLow+'–'+t.repHigh+' · 🎯 streef <b>'+fmt(streef)+' kg × '+(st.reps||t.repLow)+'</b>'+(last?' · vorige '+fmt(last.weight)+' kg':'')+'</div>'+
+          '<button class="tipbtn" data-tip="'+e.id+'">ⓘ techniek &amp; opbouw</button>'+
+        '</div>'+
+        '<div class="mwrap" title="'+mn+'">'+muscleFigure(act)+'</div>'+
+      '</div>'+
+      '<div class="tipbox" id="tip_'+e.id+'" style="display:none"><b>Spieren:</b> '+mn+'<br><b>Plan vooruit:</b> '+proj+'<br><b>Techniek:</b> '+(TIPS[key]||TIPS.default)+'<br><b>Kant (S/L/R):</b> S = Straight (recht/midden), L = Left (links), R = Right (rechts). Handig bij bijv. de buikmachine: leg per set de kant vast (bijv. 3× S, 3× L, 3× R).'+
+        '<div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap"><button class="lnk" onclick="toggleSides(\''+e.id+'\')">Kant-optie (S/L/R): '+(sOn?'aan':'uit')+'</button><button class="lnk" onclick="toggleWtype(\''+e.id+'\')">Gewicht telt als: '+(wSide?'per kant':'totaal')+'</button></div></div>'+
+      '<div class="wrow">'+
+        '<button class="stepbtn" data-ex="'+e.id+'" data-d="'+(-estep)+'">−</button>'+
+        '<div class="wbox"><label>'+(wSide?'kg/kant':'kg')+'</label><input type="number" step="'+estep+'" inputmode="decimal" data-w="'+e.id+'" value="'+(Math.round((st.weight||0)*10)/10)+'"></div>'+
+        '<button class="stepbtn" data-ex="'+e.id+'" data-d="'+estep+'">+</button>'+
+        '<div class="wbox reps"><label>reps</label><input type="number" inputmode="numeric" data-r="'+e.id+'" value="'+(st.reps||0)+'"></div>'+
+        (sOn?('<button class="sidebtn'+(st.side?' act':'')+'" data-side="'+e.id+'" title="tik om te wisselen: geen / Straight / Left / Right">'+sideLabel(st.side)+'</button>'):'')+
+      '</div>'+
+      '<div class="wrow" style="margin-top:6px">'+
+        '<button class="logset" data-log="'+e.id+'">＋ set opslaan ('+(st.sets.length+1)+'ᵉ)</button>'+
+        '<button class="resttiny" data-rest="1">⏱ rust</button>'+
+      '</div>'+
+      '<div class="sets">'+chips+'</div>'+hint;
+    list.appendChild(div);
+  });
+  // wire
+  list.querySelectorAll('.stepbtn[data-d]').forEach(function(b){
+    b.onclick=function(){
+      var id=b.getAttribute('data-ex'),d=parseFloat(b.getAttribute('data-d'));
+      var stp=exStep(findEx(id));
+      session[id].weight=Math.max(0,snapStep((session[id].weight||0)+d,stp));renderToday();
+    };
+  });
+  list.querySelectorAll('input[data-w]').forEach(function(inp){
+    inp.onchange=function(){var id=inp.getAttribute('data-w');var v=parseFloat(inp.value.replace(',','.'));session[id].weight=isNaN(v)?0:v;};
+  });
+  list.querySelectorAll('input[data-r]').forEach(function(inp){
+    inp.onchange=function(){var id=inp.getAttribute('data-r');var v=parseInt(inp.value);session[id].reps=isNaN(v)?0:v;};
+  });
+  list.querySelectorAll('.sidebtn[data-side]').forEach(function(b){
+    b.onclick=function(){var id=b.getAttribute('data-side'),cur=session[id].side||'',order=['','S','L','R'];session[id].side=order[(order.indexOf(cur)+1)%4];renderToday();};
+  });
+  list.querySelectorAll('.logset[data-log]').forEach(function(b){
+    b.onclick=function(){var id=b.getAttribute('data-log'),s=session[id];s.sets.push({w:s.weight||0,r:s.reps||0,s:s.side||''});renderToday();startRest();};
+  });
+  list.querySelectorAll('.setchip[data-i]').forEach(function(c){
+    c.onclick=function(){var id=c.getAttribute('data-ex'),i=parseInt(c.getAttribute('data-i'));session[id].sets.splice(i,1);renderToday();};
+  });
+  list.querySelectorAll('[data-rest]').forEach(function(b){b.onclick=startRest;});
+  list.querySelectorAll('.exthumb[data-photo]').forEach(function(t){t.onclick=function(){addPhoto(t.getAttribute('data-photo'));};});
+  list.querySelectorAll('.tipbtn[data-tip]').forEach(function(b){b.onclick=function(){var el=document.getElementById('tip_'+b.getAttribute('data-tip'));el.style.display=(el.style.display==='none'?'block':'none');};});
+  list.querySelectorAll('.blockbtn[data-block]').forEach(function(b){b.onclick=function(){applyBlock(b.getAttribute('data-block'));};});
+  var ta=document.getElementById('todayAdd');
+  if(ta){ta.innerHTML=buildLibrary(curDay,'Extra oefening toevoegen (incidenteel)');wireLibrary(ta);}
+}
+function addPhoto(exId){
+  var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0];if(!f)return;
+    var img=new Image();var url=URL.createObjectURL(f);
+    img.onload=function(){
+      var max=260;var sc=Math.min(1,max/Math.max(img.width,img.height));
+      var w=Math.round(img.width*sc),h=Math.round(img.height*sc);
+      var cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      try{S.photos[exId]=cv.toDataURL('image/jpeg',0.72);save();renderToday();toast('Foto opgeslagen ✓');}
+      catch(err){toast('Kon foto niet opslaan');}
+      URL.revokeObjectURL(url);
+    };
+    img.onerror=function(){toast('Ongeldige afbeelding');URL.revokeObjectURL(url);};
+    img.src=url;
+  };
+  inp.click();
+}
+
+function resetChecks(){Object.keys(session).forEach(function(k){session[k].sets=[];});renderToday();toast('Sets gewist');}
+
+function saveSession(){
+  var entries=S.exercises[curDay].map(function(e){
+    var st=session[e.id],sets=(st&&st.sets)?st.sets:[];
+    var top=sets.reduce(function(m,s){return Math.max(m,s.w||0);},0);
+    return {exId:e.id,name:e.name,weight:top,setsDone:sets.length,sets:sets.slice(),period:0};
+  }).filter(function(en){return en.setsDone>0;});
+  var anyDone=entries.length>0;
+  if(!anyDone){toast('Sla eerst wat sets op (＋ set)');return;}
+  var dupe=S.logs.some(function(l){return l.date===todayISO()&&l.day===curDay;});
+  if(dupe&&!confirm('Je hebt vandaag al een Dag '+curDay+'-training opgeslagen. Nog een keer opslaan als extra training?')){return;}
+  S.logs.push({id:'L'+Date.now(),date:todayISO(),day:curDay,period:0,entries:entries});
+  save();initSession();renderToday();renderHist();
+  toast('Training opgeslagen ✓');nav('hist');
+}
+
+/* ---------- rest timer ---------- */
+var restT=null,restLeft=0;
+function startRest(){restLeft=S.restSec;showRest();document.getElementById('restLabel').textContent='Rust — volgende set';
+  if(restT)clearInterval(restT);
+  restT=setInterval(function(){restLeft--;showRest();if(restLeft<=0){finishRest();}},1000);}
+function showRest(){document.getElementById('restOverlay').style.display='flex';
+  var m=Math.floor(Math.max(0,restLeft)/60),s=Math.max(0,restLeft)%60;
+  document.getElementById('restTime').textContent=m+':'+p2(s);}
+function addRest(n){restLeft+=n;showRest();}
+function finishRest(){clearInterval(restT);restT=null;
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  beep();document.getElementById('restLabel').textContent='Klaar! 💪';restLeft=0;
+  document.getElementById('restTime').textContent='0:00';
+  setTimeout(stopRest,1200);}
+function stopRest(){if(restT)clearInterval(restT);restT=null;document.getElementById('restOverlay').style.display='none';}
+function beep(){try{var c=new (window.AudioContext||window.webkitAudioContext)();var o=c.createOscillator();var g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=0.15;o.start();setTimeout(function(){o.stop();c.close();},250);}catch(e){}}
+
+/* ---------- history ---------- */
+var progEx=null,progShowMore=false;
+function allExercises(){var seen={},out=[];['A','B','C'].forEach(function(d){S.exercises[d].forEach(function(e){if(!seen[e.id]){seen[e.id]=1;out.push({e:e,day:d});}});});return out;}
+function exUsage(exId){var c=0;(S.logs||[]).forEach(function(L){if((L.entries||[]).some(function(x){return x.exId===exId;}))c++;});return c;}
+function exLastDate(exId){for(var i=S.logs.length-1;i>=0;i--){if((S.logs[i].entries||[]).some(function(x){return x.exId===exId;}))return S.logs[i].date;}return null;}
+function exSeries(exId){
+  var arr=[];
+  (S.logs||[]).forEach(function(L){
+    var en=(L.entries||[]).filter(function(x){return x.exId===exId;})[0];if(!en)return;
+    var sets=(en.sets&&en.sets.length)?en.sets:[];
+    var top=en.weight||sets.reduce(function(m,s){return Math.max(m,s.w||0);},0);
+    var vol=sets.reduce(function(m,s){return m+(s.w||0)*(s.r||0);},0);
+    var topReps=sets.reduce(function(m,s){return Math.max(m,s.r||0);},0);
+    arr.push({date:L.date,w:top,vol:vol,reps:topReps});
+  });
+  arr.sort(function(a,b){return a.date<b.date?-1:1;});return arr;
+}
+function openProg(exId){progEx=exId;renderHist();window.scrollTo(0,0);}
+function closeProg(){progEx=null;renderHist();window.scrollTo(0,0);}
+function exSpark(exId){
+  var s=exSeries(exId).filter(function(x){return x.w>0;});
+  if(s.length<2)return '';
+  var W=52,H=24,vs=s.map(function(x){return x.w;}),mn=Math.min.apply(null,vs),mx=Math.max.apply(null,vs);if(mx-mn<0.5){mx+=0.5;mn-=0.5;}
+  var d='';s.forEach(function(x,i){var px=i/(s.length-1)*(W-4)+2;var py=H-3-((x.w-mn)/(mx-mn))*(H-6);d+=(i?'L':'M')+px.toFixed(1)+' '+py.toFixed(1)+' ';});
+  return '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="flex:0 0 auto"><path d="'+d+'" fill="none" stroke="#2f7d5b" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+}
+function progRow(o){
+  var last=lastWeightFor(o.e.id),key=iconFor(o.e.name);
+  var lastTxt=last?('<b>'+fmt(last.weight)+' kg</b>'+(o.last?' · '+shortDate(o.last):'')):'nog niet gelogd';
+  return '<div class="libitem" data-prog="'+o.e.id+'" style="align-items:center"><div class="li">'+svgWrap(SVGS[key]||SVGS.default)+'</div>'+
+    '<div class="ln">'+o.e.name+'<div class="lm">'+lastTxt+' · '+o.use+'× getraind</div></div>'+
+    exSpark(o.e.id)+'<span style="color:var(--muted);margin-left:6px;font-size:18px">›</span></div>';
+}
+function renderProgList(){
+  var el=document.getElementById('progList');if(!el)return;
+  var items=allExercises().map(function(o){return {e:o.e,day:o.day,use:exUsage(o.e.id),last:exLastDate(o.e.id)};});
+  items.sort(function(a,b){if((b.use>0)!==(a.use>0))return (b.use>0?1:0)-(a.use>0?1:0);if(b.use!==a.use)return b.use-a.use;if((b.last||'')!==(a.last||''))return (b.last||'')<(a.last||'')?-1:1;return a.e.name<b.e.name?-1:1;});
+  if(!items.length){el.innerHTML='<p class="muted">Nog geen oefeningen.</p>';return;}
+  var top=items.slice(0,10),rest=items.slice(10);
+  var h=top.map(progRow).join('');
+  if(rest.length){h+=(progShowMore?rest.map(progRow).join(''):'')+'<button class="addex" onclick="progShowMore=!progShowMore;renderProgList()" style="margin-top:8px">'+(progShowMore?'minder ▲':'meer oefeningen ('+rest.length+') ▼')+'</button>';}
+  el.innerHTML=h;
+  el.querySelectorAll('[data-prog]').forEach(function(r){r.onclick=function(){openProg(r.getAttribute('data-prog'));};});
+}
+function bigLine(data,opt){
+  opt=opt||{};var fmtF=opt.fmt||function(v){return fmt(v);};
+  if(!data.length)return '<p class="muted">Nog geen data — log eerst een paar trainingen.</p>';
+  if(data.length===1)return '<p class="muted">Eén training gelogd: <b>'+fmtF(data[0].y)+(opt.unit?' '+opt.unit:'')+'</b>. Log meer voor een lijn.</p>';
+  var W=300,H=132,padL=36,padR=42,padT=12,padB=22;
+  var xs=data.map(function(p){return p.x;}),vs=data.map(function(p){return p.y;});
+  var xmin=Math.min.apply(null,xs),xmax=Math.max.apply(null,xs);
+  var vmin=Math.min.apply(null,vs),vmax=Math.max.apply(null,vs);
+  if(vmax-vmin<1){vmax+=1;vmin-=1;}
+  var padv=(vmax-vmin)*0.15;vmin-=padv;vmax+=padv;if(vmin<0)vmin=0;
+  function X(t){return xmin===xmax?padL:padL+(t-xmin)/(xmax-xmin)*(W-padL-padR);}
+  function Y(v){return padT+(vmax-v)/(vmax-vmin)*(H-padT-padB);}
+  var d='',pts='';data.forEach(function(p,i){d+=(i?'L':'M')+X(xs[i]).toFixed(1)+' '+Y(vs[i]).toFixed(1)+' ';pts+='<circle cx="'+X(xs[i]).toFixed(1)+'" cy="'+Y(vs[i]).toFixed(1)+'" r="2.4" fill="'+(opt.color||'#2f7d5b')+'"/>';});
+  var last=data[data.length-1];
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+
+    '<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(H-padB)+'" stroke="#e4e8e4"/>'+
+    '<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="#e4e8e4"/>'+
+    '<text x="'+(padL-4)+'" y="'+(padT+4)+'" text-anchor="end" font-size="9" fill="#67716a">'+fmtF(vmax)+'</text>'+
+    '<text x="'+(padL-4)+'" y="'+(H-padB)+'" text-anchor="end" font-size="9" fill="#67716a">'+fmtF(vmin)+'</text>'+
+    '<path d="'+d+'" fill="none" stroke="'+(opt.color||'#2f7d5b')+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+pts+
+    '<text x="'+padL+'" y="'+(H-6)+'" font-size="9" fill="#67716a">'+shortDate(data[0].label)+'</text>'+
+    '<text x="'+(W-padR)+'" y="'+(H-6)+'" text-anchor="end" font-size="9" fill="#67716a">'+shortDate(last.label)+'</text>'+
+    '<text x="'+(W-padR+2)+'" y="'+(Y(last.y)+3)+'" font-size="10" font-weight="700" fill="#245c44">'+fmtF(last.y)+'</text>'+
+    '</svg>';
+}
+function progDetailHtml(exId){
+  var e=findEx(exId);
+  if(!e)return '<div class="card"><button class="lnk" onclick="closeProg()" style="font-size:14px">← terug</button><p class="muted">Oefening niet gevonden.</p></div>';
+  var s=exSeries(exId),key=iconFor(e.name),t=target();
+  var wData=s.filter(function(x){return x.w>0;}).map(function(x){return {x:new Date(x.date+'T00:00:00').getTime(),y:x.w,label:x.date};});
+  var vData=s.filter(function(x){return x.vol>0;}).map(function(x){return {x:new Date(x.date+'T00:00:00').getTime(),y:x.vol,label:x.date};});
+  var last=lastWeightFor(exId),best=s.reduce(function(m,x){return Math.max(m,x.w||0);},0);
+  var streef=suggestWeight(e),reps=nextReps(e),estep=exStep(e);
+  var h='<div class="card">';
+  h+='<button class="lnk" onclick="closeProg()" style="font-size:14px">← terug naar overzicht</button>';
+  h+='<div style="display:flex;align-items:center;gap:12px;margin-top:8px"><div class="exthumb" style="width:52px;height:52px;border-radius:12px;overflow:hidden">'+(S.photos[exId]?'<img src="'+S.photos[exId]+'" style="width:100%;height:100%;object-fit:cover">':svgWrap(SVGS[key]||SVGS.default))+'</div><div><div style="font-weight:700;font-size:17px">'+e.name+'</div><div class="muted" style="font-size:12.5px">'+s.length+'× getraind'+(last?' · laatst '+fmt(last.weight)+' kg':'')+(best?' · record '+fmt(best)+' kg':'')+'</div></div></div></div>';
+  h+='<div class="card"><h2>Gewicht over tijd</h2><p class="muted" style="margin-top:-4px">Je zwaarste set per training.</p>'+bigLine(wData,{unit:'kg'})+'</div>';
+  h+='<div class="card"><h2>Gewicht × reps over tijd</h2><p class="muted" style="margin-top:-4px">Totaal volume per training — stijgt ook als je reps opbouwt bij gelijk gewicht.</p>'+bigLine(vData,{color:'#245c44',fmt:function(v){return nl(Math.round(v));},unit:'kg'})+'</div>';
+  var steps=progressionPlan(streef,reps,6,estep);
+  var ladder=steps.map(function(st,i){return '<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="width:18px;text-align:right;color:var(--muted);font-size:12px">'+(i+1)+'</span><div style="flex:1;height:'+(22+i*4)+'px;background:linear-gradient(90deg,var(--soft),#cfe5d8);border-radius:7px;display:flex;align-items:center;padding:0 11px;font-size:13px;font-weight:700;color:#245c44">'+fmt(st.w)+' kg × '+st.reps+'</div></div>';}).join('');
+  h+='<div class="card"><h2>Jouw plan vooruit 📈</h2><p class="muted" style="margin-top:-4px">Eerst reps opbouwen tot '+t.repHigh+', dán het gewicht een stap omhoog (stappen van '+fmt(estep)+' kg voor deze oefening). Zo blijft je lijn rustig stijgen — geen vaste periodes meer.</p>'+ladder+'<p class="muted" style="margin-top:8px;font-size:12.5px">🎯 Volgende training: <b style="color:#245c44">'+fmt(streef)+' kg × '+reps+'</b> — richt op '+t.sets+' sets.</p></div>';
+  return h;
+}
+function renderHistLog(){
+  var hl=document.getElementById('histList');if(!hl)return;
+  if(!S.logs.length){hl.innerHTML='<p class="muted">Nog geen trainingen opgeslagen.</p>';return;}
+  var html='';
+  for(var i=S.logs.length-1;i>=0;i--){
+    var L=S.logs[i];
+    if(editingLog===L.id){html+=logEditForm(L);continue;}
+    var detail=L.entries.map(function(e){
+      var s=(e.sets&&e.sets.length)?e.sets.map(function(x){return fmt(x.w)+'×'+(x.r||0)+(x.s?' '+x.s:'');}).join(', '):(fmt(e.weight)+' kg · '+(e.setsDone||0)+' sets');
+      return '<b>'+e.name+':</b> '+s;
+    }).join('<br>');
+    html+='<div class="sesh"><div class="sh"><span>Dag '+L.day+' — '+DAYLABEL[L.day]+'</span><span class="muted">'+L.date+'</span></div>'+
+      '<div class="sd">'+detail+'</div>'+
+      '<div style="margin-top:8px;display:flex;gap:16px">'+
+        '<button class="lnk" onclick="editLog(\''+L.id+'\')">✏️ aanpassen</button>'+
+        '<button class="lnk danger" onclick="delLog(\''+L.id+'\')">🗑 verwijderen</button>'+
+      '</div></div>';
+  }
+  hl.innerHTML=html;
+}
+function renderHist(){
+  var det=document.getElementById('progDetail'),ov=document.getElementById('progOverview');
+  if(!det||!ov)return;
+  if(progEx){det.style.display='';ov.style.display='none';det.innerHTML=progDetailHtml(progEx);return;}
+  det.style.display='none';ov.style.display='';
+  renderProgList();renderHistLog();
+}
+var editingLog=null;
+function findLog(id){return S.logs.filter(function(l){return l.id===id;})[0];}
+function editLog(id){editingLog=id;progEx=null;renderHist();}
+function closeEditLog(){editingLog=null;save();renderHist();toast('Wijzigingen opgeslagen ✓');}
+function logSetDate(id,v){var L=findLog(id);if(L&&v){L.date=v;save();}}
+function ensureSets(en){if(!en.sets){en.sets=[];for(var i=0;i<(en.setsDone||0);i++)en.sets.push({w:en.weight||0,r:0,s:''});}return en.sets;}
+function logRecalc(en){en.setsDone=en.sets.length;en.weight=en.sets.reduce(function(m,s){return Math.max(m,s.w||0);},0);}
+function logSetVal(id,ei,si,field,v){var L=findLog(id);if(!L||!L.entries[ei])return;var en=L.entries[ei];ensureSets(en);if(!en.sets[si])return;if(field==='w')en.sets[si].w=parseFloat((v||'').replace(',','.'))||0;else if(field==='r')en.sets[si].r=parseInt(v)||0;logRecalc(en);save();}
+function logCycleSide(id,ei,si){var L=findLog(id);if(!L||!L.entries[ei])return;ensureSets(L.entries[ei]);var order=['','S','L','R'],cur=L.entries[ei].sets[si].s||'';L.entries[ei].sets[si].s=order[(order.indexOf(cur)+1)%4];save();renderHist();}
+function logRemoveSet(id,ei,si){var L=findLog(id);if(!L||!L.entries[ei])return;ensureSets(L.entries[ei]).splice(si,1);logRecalc(L.entries[ei]);save();renderHist();}
+function logAddSet(id,ei){var L=findLog(id);if(!L||!L.entries[ei])return;var en=L.entries[ei];ensureSets(en);var lastS=en.sets[en.sets.length-1];en.sets.push({w:lastS?lastS.w:(en.weight||0),r:lastS?lastS.r:0,s:lastS?lastS.s:''});logRecalc(en);save();renderHist();}
+function logRemoveEntry(id,idx){var L=findLog(id);if(!L)return;if(!confirm('Deze oefening uit de training verwijderen?'))return;L.entries.splice(idx,1);save();renderHist();}
+function logAddOptions(day){
+  var h='<option value="" disabled selected>Oefening toevoegen…</option><optgroup label="Uit dag '+day+'">';
+  S.exercises[day].forEach(function(e){h+='<option value="id:'+e.id+'">'+e.name+'</option>';});
+  h+='</optgroup>';
+  var cats={},order=[];CATALOG.forEach(function(it){if(!cats[it.c]){cats[it.c]=[];order.push(it.c);}cats[it.c].push(it);});
+  order.forEach(function(c){h+='<optgroup label="'+c+'">';cats[c].forEach(function(it){h+='<option value="cat:'+it.n.replace(/"/g,'&quot;')+'">'+it.n+'</option>';});h+='</optgroup>';});
+  return h;
+}
+function logAddEntry(id){
+  var L=findLog(id);if(!L)return;var sel=document.getElementById('logadd_'+id);var v=sel?sel.value:'';if(!v){toast('Kies een oefening');return;}
+  var name,exId,start;
+  if(v.indexOf('id:')===0){var eid=v.slice(3),ex=null;['A','B','C'].forEach(function(d){S.exercises[d].forEach(function(e){if(e.id===eid)ex=e;});});if(!ex){toast('Niet gevonden');return;}name=ex.name;exId=ex.id;start=ex.start;}
+  else{name=v.slice(4);var it=CATALOG.filter(function(x){return x.n===name;})[0];exId='x'+Date.now();start=it?it.s:20;}
+  var tR=target().repLow;
+  L.entries.push({exId:exId,name:name,weight:start,setsDone:1,sets:[{w:start,r:tR,s:''}],period:0});
+  save();renderHist();toast(name+' toegevoegd');
+}
+function logEditForm(L){
+  var h='<div class="sesh" style="border:1px solid var(--accent)">';
+  h+='<div class="sh"><span>✏️ Training aanpassen — Dag '+L.day+'</span></div>';
+  h+='<div class="field" style="margin:8px 0"><label>Datum</label><input type="date" value="'+L.date+'" onchange="logSetDate(\''+L.id+'\',this.value)"></div>';
+  L.entries.forEach(function(en,ei){
+    ensureSets(en);
+    h+='<div style="border:1px solid var(--line);border-radius:11px;padding:9px;margin:8px 0">';
+    h+='<div style="display:flex;align-items:center;gap:8px"><div class="rowicon" style="width:28px;height:28px">'+svgWrap(SVGS[iconFor(en.name)]||SVGS.default)+'</div><div style="flex:1;font-weight:600;font-size:13.5px">'+en.name+'</div><button style="background:none;border:none;color:var(--danger);cursor:pointer" onclick="logRemoveEntry(\''+L.id+'\','+ei+')">🗑</button></div>';
+    en.sets.forEach(function(se,si){
+      h+='<div style="display:flex;gap:5px;align-items:center;margin:5px 0">'+
+         '<span class="muted" style="width:14px;font-size:12px">'+(si+1)+'</span>'+
+         '<input type="number" step="2.5" inputmode="decimal" style="width:58px;padding:7px;border:1px solid var(--line);border-radius:8px;text-align:right" value="'+(Math.round((se.w||0)*10)/10)+'" onchange="logSetVal(\''+L.id+'\','+ei+','+si+',\'w\',this.value)"><span class="muted" style="font-size:11px">kg</span>'+
+         '<input type="number" inputmode="numeric" style="width:42px;padding:7px;border:1px solid var(--line);border-radius:8px;text-align:right" value="'+(se.r||0)+'" onchange="logSetVal(\''+L.id+'\','+ei+','+si+',\'r\',this.value)"><span class="muted" style="font-size:11px">reps</span>'+
+         '<button class="sidebtn" style="min-width:32px;padding:6px 5px" onclick="logCycleSide(\''+L.id+'\','+ei+','+si+')">'+(se.s||'—')+'</button>'+
+         '<button style="background:none;border:none;color:var(--danger);cursor:pointer;margin-left:auto" onclick="logRemoveSet(\''+L.id+'\','+ei+','+si+')">✕</button>'+
+         '</div>';
+    });
+    h+='<button class="lnk" onclick="logAddSet(\''+L.id+'\','+ei+')">+ set</button>';
+    h+='</div>';
+  });
+  h+='<div style="display:flex;gap:8px;margin-top:8px"><select id="logadd_'+L.id+'" style="flex:1;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13.5px">'+logAddOptions(L.day)+'</select><button class="addex" style="width:auto;margin:0;padding:10px 12px" onclick="logAddEntry(\''+L.id+'\')">+ oefening</button></div>';
+  h+='<button class="btn" style="margin-top:10px" onclick="closeEditLog()">Klaar</button>';
+  h+='</div>';
+  return h;
+}
+function delLog(id){var L=S.logs.filter(function(l){return l.id===id;})[0];if(L&&!confirm('Deze training verwijderen uit je logboek? (Dag '+L.day+' — '+L.date+')'))return;S.logs=S.logs.filter(function(l){return l.id!==id;});save();renderHist();toast('Training verwijderd');}
+
+/* ---------- food ---------- */
+var foodDate=null;
+function setFoodDate(v){foodDate=v||todayISO();renderFood();}
+function setFoodKcal(v){var day=foodDate||todayISO();S.food[day]=S.food[day]||{};S.food[day].kcal=parseInt((v||'').replace(/[^0-9]/g,''))||0;save();kcalAvgView();}
+function kcalAvgView(){
+  var el=document.getElementById('kcalAvg');if(!el)return;
+  var vals=[],d=new Date();
+  for(var i=0;i<7;i++){var iso=isoOf(d);var f=S.food[iso];if(f&&f.kcal)vals.push(f.kcal);d.setDate(d.getDate()-1);}
+  el.textContent=vals.length?('Gemiddeld deze week: '+nl(Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length))+' kcal/dag'):'';
+}
+function renderFood(){
+  var day=foodDate||todayISO();var f=S.food[day]||{};
+  var di=document.getElementById('foodDateInput');if(di)di.value=day;
+  var kc=document.getElementById('foodKcal');if(kc&&document.activeElement!==kc)kc.value=f.kcal||'';
+  var c=document.getElementById('foodChecks');c.innerHTML='';
+  FOODITEMS.forEach(function(it){
+    var on=!!f[it[0]];
+    var row=document.createElement('div');row.className='chk';
+    row.innerHTML='<div class="box'+(on?' on':'')+'">'+(on?'✓':'')+'</div><div class="txt">'+it[1]+'<small>'+it[2]+'</small></div>';
+    row.querySelector('.box').onclick=function(){
+      f[it[0]]=!f[it[0]];S.food[day]=f;save();renderFood();
+    };
+    c.appendChild(row);
+  });
+  // streak: consecutive days with all 4
+  var st=0;var d=new Date();
+  for(var i=0;i<60;i++){
+    var iso=d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+    var ff=S.food[iso];
+    if(ff&&FOODITEMS.every(function(it){return ff[it[0]];})){st++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+  document.getElementById('streak').textContent=st>0?('🔥 '+st+' dag'+(st>1?'en':'')+' op rij alle vier gehaald!'):'Vink je vier pijlers af voor een streak.';
+  var gsel=document.getElementById('nutriGoal');if(gsel)gsel.value=S.nutriGoal||'behoud';
+  weightChart();adherenceChart();nutriAdvice();renderDexa();kcalAvgView();bmiView();renderBody();
+}
+function isoOf(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());}
+function shortDate(iso){var pp=iso.split('-');return parseInt(pp[2])+'/'+parseInt(pp[1]);}
+function setGoal(v){S.nutriGoal=v;save();nutriAdvice();}
+function addMeasure(){
+  var w=parseFloat((document.getElementById('mWeight').value||'').replace(',','.'));
+  if(isNaN(w)){toast('Vul een gewicht in');return;}
+  var d=todayISO();var ex=S.measure.filter(function(x){return x.date===d;})[0];
+  if(ex){ex.weight=w;}
+  else{S.measure.push({id:'M'+Date.now(),date:d,weight:w});}
+  save();document.getElementById('mWeight').value='';
+  renderFood();toast('Gewicht opgeslagen ✓');
+}
+function dxnum(id){var v=parseFloat((document.getElementById(id).value||'').replace(',','.'));return isNaN(v)?null:v;}
+function dexaCls(v){if(v==null)return null;if(v<=-2.5)return {l:'osteoporose',c:'#b23b3b'};if(v<=-1)return {l:'osteopenie',c:'#8a5a00'};return {l:'normaal',c:'#2f7d5b'};}
+function addDexa(){
+  var e={id:'DX'+Date.now(),date:document.getElementById('dxDate').value||todayISO(),
+    spine:dxnum('dxSpine'),spineLow:dxnum('dxSpineLow'),hipL:dxnum('dxHipL'),neckL:dxnum('dxNeckL'),
+    hipR:dxnum('dxHipR'),neckR:dxnum('dxNeckR'),note:document.getElementById('dxNote').value||''};
+  if(e.spine==null&&e.spineLow==null&&e.hipL==null&&e.hipR==null&&e.neckL==null&&e.neckR==null){toast('Vul minstens één T-score in');return;}
+  S.dexa.push(e);save();
+  ['dxSpine','dxSpineLow','dxHipL','dxNeckL','dxHipR','dxNeckR','dxNote'].forEach(function(id){document.getElementById(id).value='';});
+  renderDexa();toast('DEXA-meting opgeslagen ✓');
+}
+function delDexa(id){if(confirm('Deze DEXA-meting verwijderen?')){S.dexa=S.dexa.filter(function(x){return x.id!==id;});save();renderDexa();}}
+function renderDexa(){
+  var el=document.getElementById('dexaTable');if(!el)return;
+  var dd=document.getElementById('dxDate');if(dd&&!dd.value)dd.value=todayISO();
+  var m=(S.dexa||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
+  var concl=document.getElementById('dexaConclusion');
+  if(!m.length){el.innerHTML='<p class="muted">Nog geen DEXA-meting.</p>';concl.innerHTML='';return;}
+  var rows=[['LWK gemiddeld','spine'],['Laagste (L1)','spineLow'],['Heup links','hipL'],['Hals links','neckL'],['Heup rechts','hipR'],['Hals rechts','neckR']];
+  var h='<div style="overflow-x:auto"><table><tr><th>Plek</th>';
+  m.forEach(function(e){h+='<th class="num">'+shortDate(e.date)+'</th>';});
+  h+='</tr>';
+  rows.forEach(function(r){h+='<tr><td>'+r[0]+'</td>';m.forEach(function(e){var v=e[r[1]];if(v==null){h+='<td class="num">—</td>';}else{var cl=dexaCls(v);h+='<td class="num" style="color:'+cl.c+';font-weight:700">'+fmt(v)+'</td>';}});h+='</tr>';});
+  h+='</table></div>';el.innerHTML=h;
+  var last=m[m.length-1];
+  var vals=[last.spine,last.spineLow,last.hipL,last.neckL,last.hipR,last.neckR].filter(function(v){return v!=null;});
+  var low=Math.min.apply(null,vals);var cl=dexaCls(low);var trend='';
+  if(m.length>1){var prev=m[m.length-2];if(prev.spine!=null&&last.spine!=null){var dl=Math.round((last.spine-prev.spine)*100)/100;trend=' Onderrug t.o.v. vorige meting: '+(dl>=0?'+':'')+fmt(dl)+' ('+(dl>0?'verbeterd 👍':(dl<0?'gedaald':'gelijk'))+').';}}
+  var del='';m.forEach(function(e){del+=' <button onclick="delDexa(\''+e.id+'\')" style="background:none;border:none;color:#b23b3b;font-size:11.5px;cursor:pointer;padding:0">verwijder '+shortDate(e.date)+'</button>';});
+  concl.innerHTML='<div class="good" style="margin-top:10px"><b>Uitslag ('+shortDate(last.date)+'):</b> laagste T-score '+fmt(low)+' → <b style="color:'+cl.c+'">'+cl.l+'</b>.'+trend+' Bot verandert traag; plan je volgende scan doorgaans na 1–2 jaar.'+(last.note?'<br><span class="muted" style="font-size:12px">'+last.note+'</span>':'')+'<div style="margin-top:6px">'+del+'</div></div>';
+}
+function measuresSorted(){return S.measure.slice().sort(function(a,b){return a.date<b.date?-1:1;});}
+/* ---------- BMI ---------- */
+function bmiVal(){var m=measuresSorted().filter(function(x){return x.weight!=null;});if(!m.length||!S.heightCm)return null;var h=S.heightCm/100;return m[m.length-1].weight/(h*h);}
+function bmiCat(b){if(b==null)return null;if(b<18.5)return{l:'ondergewicht',c:'#8a5a00'};if(b<25)return{l:'gezond gewicht',c:'#2f7d5b'};if(b<30)return{l:'overgewicht',c:'#c98a00'};return{l:'obesitas',c:'#b23b3b'};}
+function editHeight(){S.heightCm=null;save();renderFood();}
+/* ---------- taille & taille-tot-lengte (WHtR) — betere maat dan BMI ---------- */
+function waistSorted(){return (S.waist||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});}
+function lastWaist(){var a=waistSorted();return a.length?a[a.length-1].cm:null;}
+function whtrVal(){var w=lastWaist();if(!w||!S.heightCm)return null;return w/S.heightCm;}
+function whtrCat(r){if(r==null)return null;if(r<0.4)return{l:'aan de slanke kant',c:'#8a5a00'};if(r<0.5)return{l:'gezond',c:'#2f7d5b'};if(r<0.6)return{l:'verhoogd',c:'#c98a00'};return{l:'hoog',c:'#b23b3b'};}
+function addWaist(){
+  var w=parseFloat((document.getElementById('mWaist').value||'').replace(',','.'));
+  if(isNaN(w)){toast('Vul een taille-omtrek in');return;}
+  var d=todayISO(),ex=(S.waist||[]).filter(function(x){return x.date===d;})[0];
+  if(ex){ex.cm=w;}else{S.waist=S.waist||[];S.waist.push({id:'W'+Date.now(),date:d,cm:w});}
+  save();document.getElementById('mWaist').value='';renderFood();toast('Taille opgeslagen ✓');
+}
+function bmiView(){
+  var el=document.getElementById('bmiBox');if(!el)return;
+  if(!S.heightCm){el.innerHTML='<div class="field" style="margin:8px 0"><label>Je lengte (cm) — eenmalig, voor taille-tot-lengte en BMI</label><input type="number" inputmode="numeric" id="heightIn" placeholder="bijv. 182" onchange="setHeight(this.value)"></div>';return;}
+  var h='';
+  var r=whtrVal();
+  if(r==null){
+    h+='<p class="muted" style="margin:8px 0">Vul je taille in bij <b>Lichaamsmaten</b> hieronder voor je taille-tot-lengte — je betrouwbaarste maat (lengte '+fmt(S.heightCm)+' cm · <button class="lnk" style="display:inline;padding:0" onclick="editHeight()">wijzig</button>).</p>';
+  }else{
+    var cat=whtrCat(r),tgtCm=S.heightCm/2,lo=0.35,hi=0.65;
+    function pos(v){return Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100));}
+    var grad='linear-gradient(90deg,#c98a00 0%,#c98a00 16.7%,#2f7d5b 16.7%,#2f7d5b 50%,#c98a00 50%,#c98a00 83.3%,#b23b3b 83.3%,#b23b3b 100%)';
+    var bar='<div style="position:relative;height:14px;border-radius:8px;margin:12px 0 6px;background:'+grad+'">'+
+      '<div title="doel 0,5" style="position:absolute;top:-5px;left:'+pos(0.5)+'%;width:2px;height:24px;background:#1c231e;transform:translateX(-1px)"></div>'+
+      '<div style="position:absolute;top:-10px;left:'+pos(r)+'%;transform:translateX(-50%);font-size:13px;line-height:1">▼</div></div>';
+    h+='<div style="display:flex;align-items:baseline;gap:10px;margin-top:12px"><span style="font-size:30px;font-weight:800;color:'+cat.c+'">'+(Math.round(r*100)/100).toString().replace('.',',')+'</span><span style="font-weight:700;color:'+cat.c+'">'+cat.l+'</span><span class="muted" style="margin-left:auto;font-size:12px">doel &lt; 0,5</span></div>'+bar+
+      '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)"><span>0,35</span><span>0,4</span><span>0,5</span><span>0,6</span><span>0,65</span></div>'+
+      '<p class="muted" style="margin:6px 0 0;font-size:12px">Taille '+fmt(lastWaist())+' cm ÷ lengte '+fmt(S.heightCm)+' cm. Streef: taille onder de helft van je lengte = <b>&lt; '+fmt(tgtCm)+' cm</b>. Groen = gezond (0,4–0,5), oranje = aandacht, rood = hoog. Spieropbouw verandert dit getal niet — alleen buikvet.</p>';
+    h+=whtrChart();
+  }
+  // BMI als informatief tweede getal
+  var b=bmiVal();
+  if(b!=null){var bc=bmiCat(b);h+='<p class="muted" style="margin:10px 0 0;font-size:12px;border-top:1px solid var(--line);padding-top:8px">Ter info — <b>BMI '+fmt(b)+'</b> ('+bc.l+'). BMI telt spier niet apart mee, dus voor jouw doel (meer spier, niet lichter) is taille-tot-lengte hierboven leidend.</p>';}
+  h+='<p class="muted" style="margin:6px 0 0;font-size:11.5px">Taille meten: op blote huid, midden tussen je onderste rib en je heupbot (± ter hoogte van de navel), ontspannen na een normale uitademing — meetlint strak maar niet knellend, bij voorkeur ’s ochtends.</p>';
+  el.innerHTML=h;
+}
+function whtrChart(){
+  var m=waistSorted();if(m.length<2)return '';
+  var data=m.map(function(x){return {x:new Date(x.date+'T00:00:00').getTime(),y:x.cm,label:x.date};});
+  return '<div style="margin-top:10px"><div class="muted" style="font-size:12px;margin-bottom:2px">Taille over tijd (cm)</div>'+bigLine(data,{color:'#245c44',unit:'cm'})+'</div>';
+}
+/* ---------- lichaamsmaten-figuur ---------- */
+var BODYSITES=[
+  {k:'neck',label:'Nek',cx:150,cy:49,rx:9,side:'L'},
+  {k:'shoulders',label:'Schouders',cx:150,cy:66,rx:40,side:'R'},
+  {k:'chest',label:'Borst',cx:150,cy:92,rx:36,side:'L'},
+  {k:'uarm',label:'Bovenarm',cx:196,cy:100,rx:9,side:'R'},
+  {k:'farm',label:'Onderarm',cx:196,cy:165,rx:8,side:'R'},
+  {k:'waist',label:'Taille',cx:150,cy:150,rx:28,side:'L',color:true},
+  {k:'hip',label:'Heup',cx:150,cy:182,rx:32,side:'L'},
+  {k:'thigh',label:'Bovenbeen',cx:167,cy:228,rx:13,side:'R'},
+  {k:'calf',label:'Kuit',cx:167,cy:300,rx:11,side:'R'}
+];
+var bodySel=null;
+function metricLabel(k){var s=BODYSITES.filter(function(x){return x.k===k;})[0];return s?s.label:k;}
+function metricHist(k){
+  if(k==='waist')return waistSorted().map(function(x){return {date:x.date,cm:x.cm};});
+  return ((S.bodyHist||{})[k]||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
+}
+function getBodyVal(k){var h=metricHist(k);return h.length?h[h.length-1].cm:null;}
+function setBody(k,val){
+  var raw=(val||'').replace(',','.').replace(/[^0-9.]/g,''),n=parseFloat(raw);
+  var d=todayISO();
+  if(k==='waist'){
+    if(isNaN(n)||n<=0){renderFood();return;}
+    var ex=(S.waist||[]).filter(function(x){return x.date===d;})[0];
+    if(ex){ex.cm=n;}else{S.waist=S.waist||[];S.waist.push({id:'W'+Date.now(),date:d,cm:n});}
+  }else{
+    S.bodyHist=S.bodyHist||{};S.bodyHist[k]=S.bodyHist[k]||[];
+    if(isNaN(n)||n<=0){renderFood();return;}
+    var e2=S.bodyHist[k].filter(function(x){return x.date===d;})[0];
+    if(e2){e2.cm=n;}else{S.bodyHist[k].push({date:d,cm:n});}
+    if(S.body&&S.body[k])delete S.body[k]; // oude opslag opruimen
+  }
+  save();renderFood();
+}
+function selectMetric(k){bodySel=(bodySel===k?null:k);renderFood();}
+function bodyDetail(k){
+  var hist=metricHist(k),lab=metricLabel(k),isW=(k==='waist');
+  var h='<div style="border:1px solid var(--accent);border-radius:12px;padding:11px 12px;margin-top:12px">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+lab+' — verloop</b><button class="lnk" style="padding:0" onclick="selectMetric(\''+k+'\')">sluiten ✕</button></div>';
+  if(hist.length<1){h+='<p class="muted" style="margin:8px 0 0">Nog geen meting. Vul '+lab.toLowerCase()+' in bij de velden hierboven.</p></div>';return h;}
+  var last=hist[hist.length-1],first=hist[0],prev=hist.length>1?hist[hist.length-2]:null;
+  function chg(from,to){
+    var d=Math.round((to-from)*10)/10;
+    // "goede richting": taille omlaag = groen; overige maten omhoog (spiergroei) = groen
+    var good=isW?(d<0):(d>0);
+    var col=(d===0)?'#67716a':(good?'#2f7d5b':'#c98a00');
+    var arr=d>0?'▲':(d<0?'▼':'–');
+    return '<span style="color:'+col+';font-weight:700">'+arr+' '+(d>0?'+':'')+fmt(d)+' cm</span>';
+  }
+  h+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 2px;font-size:13px">';
+  h+='<div>Nu: <b>'+fmt(last.cm)+' cm</b> <span class="muted">('+shortDate(last.date)+')</span></div>';
+  if(prev)h+='<div>t.o.v. vorige: '+chg(prev.cm,last.cm)+'</div>';
+  if(hist.length>1)h+='<div>sinds start: '+chg(first.cm,last.cm)+' <span class="muted">('+shortDate(first.date)+')</span></div>';
+  h+='</div>';
+  if(hist.length>1){
+    var data=hist.map(function(x){return {x:new Date(x.date+'T00:00:00').getTime(),y:x.cm,label:x.date};});
+    h+=bigLine(data,{color:(isW?'#245c44':'#2f7d5b'),unit:'cm'});
+  }else{h+='<p class="muted" style="margin:6px 0 0;font-size:12px">Log deze maat op nog een dag om je toe-/afname en een grafiek te zien.</p>';}
+  h+='<p class="muted" style="margin:6px 0 0;font-size:11px">'+(isW?'Groen = taille omlaag (goede richting).':'Groen = toename (bv. spiergroei), oranje = afname.')+'</p>';
+  h+='</div>';
+  return h;
+}
+function bodyFigure(){
+  var wcol=(function(){var r=whtrVal();if(r==null)return '#67716a';return whtrCat(r).c;})();
+  var soft='#dbe6df',line='#b6c6bd';
+  var s='<svg viewBox="0 0 300 360" style="width:100%;max-width:340px;height:auto;display:block;margin:6px auto 0">';
+  // silhouet: benen + armen achter, dan romp, nek, hoofd
+  s+='<g fill="'+soft+'" stroke="'+line+'" stroke-width="1">';
+  s+='<rect x="122" y="182" width="22" height="164" rx="10"/><rect x="156" y="182" width="22" height="164" rx="10"/>'; // benen
+  s+='<rect x="99" y="68" width="14" height="140" rx="7"/><rect x="187" y="68" width="14" height="140" rx="7"/>'; // armen
+  s+='<path d="M116,64 L184,64 L176,150 L180,184 L120,184 L124,150 Z"/>'; // romp
+  s+='<rect x="143" y="43" width="14" height="9" rx="3"/>'; // nek
+  s+='<circle cx="150" cy="30" r="15"/>'; // hoofd
+  s+='</g>';
+  // meetringen + labels
+  BODYSITES.forEach(function(st){
+    var val=getBodyVal(st.k),ry=Math.max(3,Math.min(6,st.rx*0.16));
+    var col=st.color?wcol:'#4a5750';
+    var sel=(bodySel===st.k),sw=sel?3.8:2.4,tdec=sel?' text-decoration="underline"':'';
+    s+='<ellipse data-bm-sel="'+st.k+'" style="cursor:pointer" cx="'+st.cx+'" cy="'+st.cy+'" rx="'+st.rx+'" ry="'+ry.toFixed(1)+'" fill="transparent" stroke="'+col+'" stroke-width="'+sw+'"/>';
+    var vtxt=(val==null?'—':fmt(val));
+    if(st.side==='L'){
+      var lx=st.cx-st.rx;
+      if(lx>116)s+='<line x1="116" y1="'+st.cy+'" x2="'+lx+'" y2="'+st.cy+'" stroke="'+line+'" stroke-width="1"/>';
+      s+='<text data-bm-sel="'+st.k+'" style="cursor:pointer" x="6" y="'+(st.cy+3.5)+'"'+tdec+' font-size="11" fill="'+(st.color?wcol:'#1c231e')+'">'+st.label+' <tspan font-weight="700">'+vtxt+'</tspan></text>';
+    }else{
+      var rx2=st.cx+st.rx;
+      if(rx2<204)s+='<line x1="'+rx2+'" y1="'+st.cy+'" x2="204" y2="'+st.cy+'" stroke="'+line+'" stroke-width="1"/>';
+      s+='<text data-bm-sel="'+st.k+'" style="cursor:pointer" x="294" y="'+(st.cy+3.5)+'" text-anchor="end"'+tdec+' font-size="11" fill="'+(st.color?wcol:'#1c231e')+'">'+st.label+' <tspan font-weight="700">'+vtxt+'</tspan></text>';
+    }
+  });
+  s+='</svg>';
+  return s;
+}
+function renderBody(){
+  var el=document.getElementById('bodyBox');if(!el)return;
+  var h=bodyFigure();
+  h+='<p class="muted" style="margin:6px 0 0;font-size:11.5px;text-align:center">Tik op een maat in de figuur voor het verloop over tijd. 📈</p>';
+  if(bodySel)h+=bodyDetail(bodySel);
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">';
+  BODYSITES.forEach(function(st){
+    var v=getBodyVal(st.k),vv=(v==null?'':(Math.round(v*10)/10)),isW=st.color,n=metricHist(st.k).length;
+    h+='<div class="field" style="flex:1 1 calc(50% - 4px);min-width:130px;margin:0"><label style="display:flex;justify-content:space-between;align-items:center"><span>'+st.label+' (cm)'+(isW?' 🎯':'')+'</span><button class="lnk" style="padding:0;font-size:11px" data-bm-trend="'+st.k+'">📈'+(n>1?' '+n:'')+'</button></label><input type="number" step="0.5" inputmode="decimal" value="'+vv+'" data-bm="'+st.k+'"></div>';
+  });
+  h+='</div>';
+  h+='<p class="muted" style="margin:10px 0 0;font-size:11.5px">Meet ontspannen, meetlint strak maar niet knellend. Tik een veld en typ je maat — de figuur werkt meteen bij. De taille kleurt groen/oranje/rood op basis van je taille-tot-lengte (streef &lt; 0,5).</p>';
+  el.innerHTML=h;
+  el.querySelectorAll('input[data-bm]').forEach(function(inp){inp.onchange=function(){setBody(inp.getAttribute('data-bm'),inp.value);};});
+  el.querySelectorAll('[data-bm-sel]').forEach(function(g){g.addEventListener('click',function(){selectMetric(g.getAttribute('data-bm-sel'));});});
+  el.querySelectorAll('[data-bm-trend]').forEach(function(g){g.onclick=function(ev){ev.preventDefault();selectMetric(g.getAttribute('data-bm-trend'));};});
+}
+function weightChart(){
+  var el=document.getElementById('wChart');if(!el)return;
+  var m=measuresSorted().filter(function(x){return x.weight!=null;});
+  if(m.length===0){el.innerHTML='<p class="muted">Nog geen gewicht gelogd — voeg je eerste meting toe.</p>';return;}
+  if(m.length===1){el.innerHTML='<p class="muted">Huidig gewicht: <b>'+fmt(m[0].weight)+' kg</b>. Log er meer voor een trendgrafiek.</p>';return;}
+  var W=300,H=124,padL=30,padR=38,padT=12,padB=22;
+  var xs=m.map(function(x){return new Date(x.date+'T00:00:00').getTime();});
+  var vs=m.map(function(x){return x.weight;});
+  var xmin=Math.min.apply(null,xs),xmax=Math.max.apply(null,xs);
+  var vmin=Math.min.apply(null,vs),vmax=Math.max.apply(null,vs);
+  if(vmax-vmin<1){vmax+=0.6;vmin-=0.6;}
+  var padv=(vmax-vmin)*0.15;vmin-=padv;vmax+=padv;
+  function X(t){return xmin===xmax?padL:padL+(t-xmin)/(xmax-xmin)*(W-padL-padR);}
+  function Y(v){return padT+(vmax-v)/(vmax-vmin)*(H-padT-padB);}
+  var d='',pts='';m.forEach(function(pp,i){d+=(i?'L':'M')+X(xs[i]).toFixed(1)+' '+Y(vs[i]).toFixed(1)+' ';pts+='<circle cx="'+X(xs[i]).toFixed(1)+'" cy="'+Y(vs[i]).toFixed(1)+'" r="2.5" fill="#2f7d5b"/>';});
+  var last=m[m.length-1];
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+
+    '<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(H-padB)+'" stroke="#e4e8e4"/>'+
+    '<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="#e4e8e4"/>'+
+    '<text x="'+(padL-4)+'" y="'+(padT+4)+'" text-anchor="end" font-size="9" fill="#67716a">'+fmt(vmax)+'</text>'+
+    '<text x="'+(padL-4)+'" y="'+(H-padB)+'" text-anchor="end" font-size="9" fill="#67716a">'+fmt(vmin)+'</text>'+
+    '<path d="'+d+'" fill="none" stroke="#2f7d5b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+pts+
+    '<text x="'+padL+'" y="'+(H-6)+'" font-size="9" fill="#67716a">'+shortDate(m[0].date)+'</text>'+
+    '<text x="'+(W-padR)+'" y="'+(H-6)+'" text-anchor="end" font-size="9" fill="#67716a">'+shortDate(last.date)+'</text>'+
+    '<text x="'+(W-padR+2)+'" y="'+(Y(last.weight)+3)+'" font-size="10" font-weight="700" fill="#245c44">'+fmt(last.weight)+'</text>'+
+    '</svg>';
+}
+function tnote(){
+  var el=document.getElementById('tscoreNote');if(!el)return;
+  var ts=measuresSorted().filter(function(x){return x.tscore!=null;});
+  if(ts.length){var l=ts[ts.length-1];el.innerHTML='<p class="muted" style="margin:6px 0 0">Laatste T-score: <b>'+fmt(l.tscore)+'</b> ('+shortDate(l.date)+'). Botdichtheid verandert traag — herhaal je DEXA elke 1–2 jaar en log de uitslag om de langetermijntrend te zien.</p>';}
+  else{el.innerHTML='<p class="muted" style="margin:6px 0 0">Tip: laat elke 1–2 jaar een DEXA doen en log je T-score hierboven om je botdichtheid over de jaren te volgen.</p>';}
+}
+function adherenceChart(){
+  var el=document.getElementById('adherChart');if(!el)return;
+  var weeks=[];var today=new Date();
+  for(var w=7;w>=0;w--){
+    var end=new Date(today);end.setDate(today.getDate()-w*7);var sum=0;
+    for(var i=0;i<7;i++){var dd=new Date(end);dd.setDate(end.getDate()-i);var f=S.food[isoOf(dd)];if(f){var cc=0;FOODITEMS.forEach(function(it){if(f[it[0]])cc++;});sum+=cc/FOODITEMS.length;}}
+    weeks.push(Math.round(sum/7*100));
+  }
+  var W=300,H=120,padB=18,padT=12,padL=8,padR=8,n=weeks.length;
+  var gap=(W-padL-padR)/n,bw=gap*0.6,bars='';
+  weeks.forEach(function(pct,i){var x=padL+i*gap+(gap-bw)/2;var h=(H-padT-padB)*pct/100;var y=H-padB-h;
+    bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(1,h).toFixed(1)+'" rx="3" fill="#2f7d5b"/>';});
+  bars+='<text x="'+(padL+bw/2).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8.5" fill="#67716a">−8 wk</text>';
+  bars+='<text x="'+(W-padR-bw/2).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8.5" fill="#67716a">nu</text>';
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto"><line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="#e4e8e4"/><line x1="'+padL+'" y1="'+padT+'" x2="'+(W-padR)+'" y2="'+padT+'" stroke="#f0f3f0"/>'+bars+'</svg>';
+}
+function nutriAdvice(){
+  var el=document.getElementById('advice');if(!el)return;
+  var m=measuresSorted().filter(function(x){return x.weight!=null;});
+  var goal=S.nutriGoal||'behoud';
+  var base=' Houd je eiwit én calcium op peil, ongeacht de richting — die beschermen je spieren en botten.';
+  if(m.length<2){el.innerHTML='<b>Bijstellen:</b> log minstens 2 gewichtsmetingen (bij voorkeur ~1×/week, ’s ochtends nuchter) om je trend te zien.'+base;return;}
+  var last=m[m.length-1],lastT=new Date(last.date).getTime();
+  var ref=m[0];for(var i=0;i<m.length;i++){if((lastT-new Date(m[i].date).getTime())/86400000<=28){ref=m[i];break;}}
+  var days=(lastT-new Date(ref.date).getTime())/86400000;
+  var perWk=days>0?(last.weight-ref.weight)/days*7:0;
+  var tt=(perWk>=0?'+':'')+(Math.round(perWk*100)/100).toString().replace('.',',')+' kg/week';
+  var a='';
+  if(goal==='behoud'){
+    if(Math.abs(perWk)<=0.25)a='Je gewicht is stabiel ('+tt+') — houd je inname zo.';
+    else if(perWk<0)a='Je valt af ('+tt+'). Als dat onbedoeld is: verhoog je inname licht (~+250 kcal/dag).';
+    else a='Je komt aan ('+tt+'). Als dat onbedoeld is: verlaag je inname licht.';
+  }else if(goal==='aankomen'){
+    if(perWk<0.1)a='Je komt te weinig aan ('+tt+'). Eet meer voor een licht overschot (~+300 kcal/dag).';
+    else if(perWk>0.4)a='Je komt snel aan ('+tt+') — iets minder kan, om vetopbouw te beperken.';
+    else a='Mooie, gestage opbouw ('+tt+') — houd dit vast.';
+  }else{
+    if(perWk>-0.1)a='Je valt (nog) niet af ('+tt+'). Verlaag je inname wat (~−350 kcal/dag).';
+    else if(perWk<-0.75)a='Je valt snel af ('+tt+') — eet iets meer om spier en bot te sparen.';
+    else a='Goed tempo ('+tt+') — houd dit vast.';
+  }
+  el.innerHTML='<b>Bijstellen:</b> '+a+base;
+}
+/* ---------- beweging / stappen ---------- */
+function nl(n){return (n||0).toLocaleString('nl-NL');}
+function setStepGoal(v){S.stepGoal=parseInt(v)||8000;save();renderMove();}
+function addSteps(){
+  var raw=(document.getElementById('sSteps').value||'').replace(/[^0-9]/g,'');
+  var v=parseInt(raw);if(isNaN(v)){toast('Vul een aantal stappen in');return;}
+  var d=(document.getElementById('sDate')&&document.getElementById('sDate').value)||todayISO();
+  var e=S.steps.filter(function(x){return x.date===d;})[0];
+  if(e)e.steps=v;else S.steps.push({id:'S'+Date.now(),date:d,steps:v});
+  save();document.getElementById('sSteps').value='';renderMove();toast('Stappen opgeslagen ('+shortDate(d)+') ✓');
+}
+var editingCross=null;
+function ctToggle(){var t=(document.getElementById('ctType')||{}).value;var kw=document.getElementById('ctKmWrap'),sw=document.getElementById('ctSportWrap');if(kw)kw.style.display=(t==='Wielrennen'||t==='Hardlopen')?'':'none';if(sw)sw.style.display=(t==='Anders')?'':'none';}
+function addCross(){
+  var d=(document.getElementById('ctDate').value)||todayISO();
+  var raw=document.getElementById('ctType').value,type=raw;
+  if(raw==='Anders'){var sp=(document.getElementById('ctSport').value||'').trim();if(!sp){toast('Vul de sport in');return;}type=sp;}
+  var duur=parseInt(document.getElementById('ctDuur').value)||0;
+  var km=parseFloat((document.getElementById('ctKm').value||'').replace(',','.'))||0;
+  var kmOK=(raw==='Wielrennen'||raw==='Hardlopen');
+  if(!duur&&!km){toast('Vul duur of km in');return;}
+  S.cross.push({id:'C'+Date.now(),date:d,type:type,duur:duur,km:kmOK?km:0});
+  save();document.getElementById('ctDuur').value='';document.getElementById('ctKm').value='';document.getElementById('ctSport').value='';
+  renderMove();toast(type+' opgeslagen ✓');
+}
+function delCross(id){if(!confirm('Deze activiteit verwijderen?'))return;S.cross=S.cross.filter(function(x){return x.id!==id;});save();renderMove();toast('Verwijderd');}
+function editCross(id){editingCross=id;renderMove();}
+function closeCrossEdit(){editingCross=null;save();renderMove();toast('Aangepast ✓');}
+function crossSet(id,f,v){var c=(S.cross||[]).filter(function(x){return x.id===id;})[0];if(!c)return;if(f==='duur')c.duur=parseInt(v)||0;else if(f==='km')c.km=parseFloat((v||'').replace(',','.'))||0;else c[f]=v;save();}
+function editFitness(id){nav('hist');editLog(id);}
+function actEmoji(t){t=(t||'').toLowerCase();if(t.indexOf('boks')>=0)return '🥊';if(t.indexOf('kracht')>=0)return '💪';if(t.indexOf('wielren')>=0||t.indexOf('fiets')>=0)return '🚴';if(t.indexOf('hardlo')>=0)return '🏃';if(t.indexOf('tennis')>=0)return '🎾';if(t.indexOf('zwem')>=0)return '🏊';return '⭐';}
+function isoWeekNum(iso){var dt=new Date(iso+'T00:00:00'),d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate())),dn=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-dn+3);var ft=new Date(Date.UTC(d.getUTCFullYear(),0,4)),fn=(ft.getUTCDay()+6)%7;ft.setUTCDate(ft.getUTCDate()-fn+3);return 1+Math.round((d-ft)/604800000);}
+function weekRange(mon){var d=new Date(mon+'T00:00:00'),e=new Date(d);e.setDate(d.getDate()+6);return d.getDate()+'/'+(d.getMonth()+1)+'–'+e.getDate()+'/'+(e.getMonth()+1);}
+function crossEditForm(c){
+  var h='<div class="sesh" style="border:1px solid var(--accent);margin:6px 0 6px 6px;padding:9px 11px">';
+  h+='<div class="field" style="margin:4px 0"><label>Datum</label><input type="date" value="'+c.date+'" onchange="crossSet(\''+c.id+'\',\'date\',this.value)"></div>';
+  h+='<div class="field" style="margin:4px 0"><label>Type / sport</label><input type="text" value="'+(c.type||'').replace(/"/g,'&quot;')+'" onchange="crossSet(\''+c.id+'\',\'type\',this.value)"></div>';
+  h+='<div style="display:flex;gap:8px"><div class="field" style="flex:1;margin:4px 0"><label>Duur (min)</label><input type="number" value="'+(c.duur||'')+'" onchange="crossSet(\''+c.id+'\',\'duur\',this.value)"></div><div class="field" style="flex:1;margin:4px 0"><label>Afstand (km)</label><input type="number" step="0.1" value="'+(c.km||'')+'" onchange="crossSet(\''+c.id+'\',\'km\',this.value)"></div></div>';
+  h+='<button class="btn" style="margin-top:6px" onclick="closeCrossEdit()">Klaar</button></div>';
+  return h;
+}
+function renderActivities(){
+  var el=document.getElementById('actWeeks');if(!el)return;
+  var acts=[];
+  (S.logs||[]).forEach(function(L){acts.push({kind:'fitness',date:L.date,log:L});});
+  (S.cross||[]).forEach(function(c){acts.push({kind:'cross',date:c.date,c:c});});
+  if(!acts.length){el.innerHTML='<p class="muted">Nog geen activiteiten. Log een fitness-training of voeg hierboven een activiteit toe.</p>';return;}
+  var groups={};acts.forEach(function(a){var m=isoWeekMon(a.date);(groups[m]=groups[m]||[]).push(a);});
+  var mondays=Object.keys(groups).sort(function(a,b){return a<b?1:-1;});
+  var today=new Date(),thisMon=isoWeekMon(isoOf(today)),lm=new Date(today);lm.setDate(today.getDate()-7);var lastMon=isoWeekMon(isoOf(lm));
+  var h='';
+  mondays.forEach(function(m,gi){
+    var items=groups[m].sort(function(a,b){return a.date<b.date?1:-1;});
+    var fit=items.filter(function(x){return x.kind==='fitness';}).length;
+    var cross=items.filter(function(x){return x.kind==='cross';}),km=0;cross.forEach(function(x){km+=x.c.km||0;});
+    var label=(m===thisMon)?'Deze week':(m===lastMon)?'Vorige week':('Week '+isoWeekNum(m));
+    var meta='('+weekRange(m)+') · 🏋️ '+fit+(cross.length?' · +'+cross.length+' activiteit'+(cross.length>1?'en':''):'')+(km?' · '+fmt(km)+' km':'');
+    h+='<details class="lib wk"'+(gi<2?' open':'')+'><summary style="font-size:15px;color:var(--ink)">📅 '+label+' <span class="muted" style="font-weight:400;font-size:12px">'+meta+'</span></summary><div style="padding:2px 10px 8px">';
+    items.forEach(function(a){
+      if(a.kind==='fitness'){
+        var L=a.log;var det=(L.entries||[]).map(function(e){var s=(e.sets&&e.sets.length)?e.sets.map(function(x){return fmt(x.w)+'×'+(x.r||0)+(x.s?' '+x.s:'');}).join(', '):(fmt(e.weight)+' kg');return '<b>'+e.name+':</b> '+s;}).join('<br>');
+        h+='<details class="lib fit" style="margin:6px 0"><summary style="font-size:13.5px;color:var(--ink);padding:8px 4px">🏋️ Fitness · Dag '+L.day+' <span class="muted" style="font-weight:400">· '+shortDate(L.date)+'</span></summary><div class="sd" style="margin:2px 0 8px 20px">'+det+'</div><button class="lnk" style="margin:0 0 8px 20px" onclick="editFitness(\''+L.id+'\')">✏️ aanpassen</button></details>';
+      }else{
+        var c=a.c;
+        if(editingCross===c.id){h+=crossEditForm(c);}
+        else{h+='<div class="sesh" style="padding:8px 11px;margin:6px 0 6px 6px"><div class="sh"><span>'+actEmoji(c.type)+' '+c.type+(c.km?' · '+fmt(c.km)+' km':'')+(c.duur?' · '+c.duur+' min':'')+'</span><span class="muted">'+shortDate(c.date)+'</span></div><div style="margin-top:4px;display:flex;gap:16px"><button class="lnk" onclick="editCross(\''+c.id+'\')">✏️ aanpassen</button><button class="lnk danger" onclick="delCross(\''+c.id+'\')">🗑 verwijderen</button></div></div>';}
+      }
+    });
+    h+='</div></details>';
+  });
+  el.innerHTML=h;
+}
+function renderMove(){
+  var g=document.getElementById('stepGoal');if(g)g.value=S.stepGoal||8000;
+  var sd=document.getElementById('sDate');if(sd&&!sd.value)sd.value=todayISO();
+  var cd=document.getElementById('ctDate');if(cd&&!cd.value)cd.value=todayISO();
+  stepTodayView();stepChart();ctToggle();renderActivities();
+}
+function stepTodayView(){
+  var el=document.getElementById('stepToday');if(!el)return;
+  var goal=S.stepGoal||8000;var e=S.steps.filter(function(x){return x.date===todayISO();})[0];var v=e?e.steps:0;
+  var pct=Math.min(100,Math.round(v/goal*100));
+  el.innerHTML='<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:13.5px"><span><b>'+nl(v)+'</b> / '+nl(goal)+' stappen</span><span class="muted">'+pct+'%</span></div>'+
+    '<div style="height:10px;background:#eef2ef;border-radius:6px;margin-top:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#2f7d5b"></div></div>'+
+    (v>=goal?'<p class="muted" style="margin:7px 0 0">🎯 Dagdoel gehaald — mooi!</p>':'')+'</div>';
+}
+function stepChart(){
+  var el=document.getElementById('stepChart');if(!el)return;
+  var goal=S.stepGoal||8000;var arr=[];var today=new Date();
+  for(var i=13;i>=0;i--){var d=new Date(today);d.setDate(today.getDate()-i);var iso=isoOf(d);var e=S.steps.filter(function(x){return x.date===iso;})[0];arr.push({iso:iso,steps:e?e.steps:0});}
+  var logged=arr.filter(function(x){return x.steps>0;});
+  if(!logged.length){el.innerHTML='<p class="muted">Nog geen stappen gelogd — voeg je eerste dag toe.</p>';document.getElementById('stepAvg').textContent='';return;}
+  var maxv=Math.max(goal,Math.max.apply(null,arr.map(function(x){return x.steps;})))*1.12;
+  var W=300,H=132,padL=8,padR=8,padT=14,padB=20,n=arr.length,gap=(W-padL-padR)/n,bw=gap*0.62,bars='';
+  arr.forEach(function(dd,i){if(dd.steps>0){var x=padL+i*gap+(gap-bw)/2;var h=(H-padT-padB)*dd.steps/maxv;var y=H-padB-h;var col=dd.steps>=goal?'#2f7d5b':'#9cc3b1';bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(1,h).toFixed(1)+'" rx="2.5" fill="'+col+'"/>';}});
+  var gy=(H-padB-(H-padT-padB)*goal/maxv).toFixed(1);
+  var gl='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="#245c44" stroke-width="1" stroke-dasharray="3 3"/><text x="'+(W-padR)+'" y="'+(gy-3)+'" text-anchor="end" font-size="8.5" fill="#245c44">doel '+nl(goal)+'</text>';
+  var lab='<text x="'+padL+'" y="'+(H-5)+'" font-size="8.5" fill="#67716a">'+shortDate(arr[0].iso)+'</text><text x="'+(W-padR)+'" y="'+(H-5)+'" text-anchor="end" font-size="8.5" fill="#67716a">'+shortDate(arr[n-1].iso)+'</text>';
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+bars+gl+lab+'</svg>';
+  var last7=arr.slice(-7).filter(function(x){return x.steps>0;});
+  var avg=last7.length?Math.round(last7.reduce(function(a,b){return a+b.steps;},0)/last7.length):0;
+  document.getElementById('stepAvg').textContent=avg?('Gemiddeld deze week: '+nl(avg)+' stappen/dag — '+(avg>=goal?'boven':'onder')+' je doel.'):'';
+}
+
+/* ---------- settings ---------- */
+function attachDrag(handle,row,box,d){
+  handle.addEventListener('pointerdown',function(ev){
+    ev.preventDefault();
+    row.classList.add('dragging');
+    try{handle.setPointerCapture(ev.pointerId);}catch(e){}
+    function onMove(e){
+      var y=e.clientY,after=null,rows=box.querySelectorAll('.exedit');
+      for(var i=0;i<rows.length;i++){var r=rows[i];if(r===row)continue;var rc=r.getBoundingClientRect();if(y>rc.top+rc.height/2)after=r;}
+      if(after==null){var first=box.querySelector('.exedit');if(first&&first!==row)box.insertBefore(row,first);}
+      else if(after.nextSibling!==row){box.insertBefore(row,after.nextSibling);}
+    }
+    function onUp(e){
+      row.classList.remove('dragging');
+      try{handle.releasePointerCapture(ev.pointerId);}catch(_){}
+      document.removeEventListener('pointermove',onMove);document.removeEventListener('pointerup',onUp);document.removeEventListener('pointercancel',onUp);
+      var ids=[],rr=box.querySelectorAll('.exedit');for(var i=0;i<rr.length;i++)ids.push(rr[i].getAttribute('data-id'));
+      var byId={};S.exercises[d].forEach(function(x){byId[x.id]=x;});
+      var order=[];ids.forEach(function(id){if(byId[id]){order.push(byId[id]);delete byId[id];}});
+      S.exercises[d].forEach(function(x){if(byId[x.id])order.push(x);});
+      S.exercises[d]=order;save();
+    }
+    document.addEventListener('pointermove',onMove);document.addEventListener('pointerup',onUp);document.addEventListener('pointercancel',onUp);
+  });
+}
+function renderSettings(){
+  document.getElementById('startDate').value=S.startDate;
+  document.getElementById('restSec').value=S.restSec;
+  var pp=document.getElementById('progPct');if(pp)pp.value=(S.progPct||2.5);
+  var bp=document.getElementById('blockPct');if(bp)bp.value=(S.blockPct||7);
+  var stg=document.getElementById('setsTarget');if(stg)stg.value=(S.setsTarget||3);
+  var rl=document.getElementById('repLow');if(rl)rl.value=(S.repLow||8);
+  var rh=document.getElementById('repHigh');if(rh)rh.value=(S.repHigh||12);
+  ['A','B','C'].forEach(function(d){
+    var box=document.getElementById('edit'+d);box.innerHTML='<p class="muted" style="margin:12px 0 4px;font-weight:600;color:var(--accent-d)">Dag '+d+' — '+DAYLABEL[d]+'</p>';
+    S.exercises[d].forEach(function(e){
+      var row=document.createElement('div');row.className='exedit';row.setAttribute('data-id',e.id);
+      var curStep=exStep(e);
+      var stpOpts=[1.25,2.5,5,10].map(function(v){return '<option value="'+v+'"'+(v===curStep?' selected':'')+'>±'+fmt(v)+'</option>';}).join('');
+      row.innerHTML='<span class="drag" title="Sleep om te ordenen">≡</span><div class="rowicon">'+svgWrap(SVGS[iconFor(e.name)]||SVGS.default)+'</div><input class="nm" value="'+e.name.replace(/"/g,'&quot;')+'"><input class="st" type="number" step="'+curStep+'" inputmode="decimal" value="'+(Math.round((e.start||0)*10)/10)+'" title="startgewicht (kg)"><select class="stp" title="Gewichtsstap van dit toestel">'+stpOpts+'</select><button class="del" title="Oefening verwijderen">🗑</button>';
+      row.querySelector('.nm').onchange=function(ev){e.name=ev.target.value;save();};
+      row.querySelector('.st').onchange=function(ev){e.start=parseFloat(ev.target.value.replace(',','.'))||0;save();if(curDay===d&&session[e.id]){session[e.id].weight=suggestWeight(e);}};
+      row.querySelector('.stp').onchange=function(ev){e.step=parseFloat(ev.target.value)||2.5;save();if(curDay===d&&session[e.id]){session[e.id].weight=suggestWeight(e);}};
+      row.querySelector('.del').onclick=function(){if(confirm('Oefening "'+e.name+'" helemaal verwijderen uit dag '+d+'? Je startgewicht aanpassen kan gewoon in het getalveld — daarvoor hoef je niets te verwijderen.')){S.exercises[d]=S.exercises[d].filter(function(x){return x.id!==e.id;});save();renderSettings();}};
+      attachDrag(row.querySelector('.drag'),row,box,d);
+      box.appendChild(row);
+    });
+    var lib=document.createElement('div');lib.innerHTML=buildLibrary(d);box.appendChild(lib);wireLibrary(lib);
+  });
+  renderCloud();
+}
+function setStartDate(v){S.startDate=v;S.periodOverride=null;save();renderToday();toast('Startdatum opgeslagen');}
+function setRest(v){S.restSec=parseInt(v)||90;save();}
+function setProgPct(v){var n=parseFloat((v||'').replace(',','.'));S.progPct=(isNaN(n)||n<0)?2.5:n;save();}
+function setSets(v){var n=parseInt(v);S.setsTarget=(isNaN(n)||n<1)?3:Math.min(6,n);save();if(document.querySelector('.view.active').id==='v-set')return;}
+function setRepLow(v){var n=parseInt(v);S.repLow=(isNaN(n)||n<1)?8:n;if(S.repHigh<S.repLow)S.repHigh=S.repLow;save();}
+function setRepHigh(v){var n=parseInt(v);S.repHigh=(isNaN(n)||n<1)?12:n;if(S.repHigh<(S.repLow||8))S.repHigh=S.repLow||8;save();}
+function setHeight(v){var n=parseFloat((v||'').replace(',','.'));S.heightCm=(isNaN(n)||n<80||n>250)?null:n;save();renderFood();}
+function setBlockPct(v){var n=parseFloat((v||'').replace(',','.'));S.blockPct=(isNaN(n)||n<0)?7:n;save();}
+function exportData(){
+  var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='botfit-data.json';a.click();
+}
+function resetAll(){if(confirm('Alles wissen en opnieuw beginnen? Dit verwijdert je logs en instellingen.')){localStorage.removeItem(KEY);S=fresh();save();initSession();renderAll();toast('Opnieuw ingesteld');}}
+function restoreDefaults(){
+  var added=0;
+  ['A','B','C'].forEach(function(d){
+    DEFAULTS[d].forEach(function(r){
+      if(!S.exercises[d].some(function(x){return x.name===r[0];})){
+        S.exercises[d].push({id:d+'r_'+Date.now()+'_'+Math.floor(rnd()*1e4),name:r[0],start:r[1]});added++;
+      }
+    });
+  });
+  if(added){save();initSession();renderSettings();renderToday();toast(added+' oefening(en) hersteld');}
+  else{toast('Alle standaardoefeningen staan er al');}
+}
+
+/* ---------- nav & toast ---------- */
+function nav(v){
+  document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
+  document.getElementById('v-'+v).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-v')===v);});
+  if(v==='hist'&&!editingLog)progEx=null;
+  if(v==='today')renderToday();if(v==='hist')renderHist();if(v==='move')renderMove();if(v==='food')renderFood();if(v==='set')renderSettings();
+  window.scrollTo(0,0);
+}
+var toastT;
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},1800);}
+
+function renderAll(){renderToday();}
+initSession();renderAll();initCloud();
+
+/* service worker */
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+</script>
+</body>
+</html>
